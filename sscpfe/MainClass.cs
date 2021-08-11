@@ -1,6 +1,6 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace sscpfe
 {
@@ -50,6 +50,27 @@ namespace sscpfe
         public int YPos { get; private set; }
         public int DefaultXPos { get; private set; }
         public int DefaultYPos { get; private set; }
+
+        public string this[int i]
+        {
+            get { return buff[i]; }
+        }
+
+        public IEnumerable<string> Buff()
+        {
+            foreach (string str in buff)
+                yield return str;
+        }
+
+        public void LoadBuff(List<string> buff)
+        {
+            this.buff = buff;
+        }
+
+        public int MaxYPos()
+        {
+            return buff.Count;
+        }
         
         string CreateEmptyLine(int len)
         {
@@ -112,14 +133,10 @@ namespace sscpfe
             string additionalEmptyString = "";
             if (YPos + 1 < buff.Count)
             {
-                for (int i = 0; i < buff[YPos + 1].Length; i++)
-                    additionalEmptyString += '\0';
+                additionalEmptyString = CreateEmptyLine(buff[YPos + 1].Length);
             }
-            buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString); ////// YPos || YPos + 1
-            string emptyString = "";
-            for (int i = 0; i < buff[YPos + 1].Length; i++)
-                emptyString += '\0';
-            buff[YPos] = buff[YPos].Substring(0, XPos) + emptyString;
+            buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString);
+            buff[YPos] = buff[YPos].Substring(0, XPos) + CreateEmptyLine(buff[YPos + 1].Length);
             YPos++;
             XPos = 0;
         }
@@ -194,7 +211,7 @@ namespace sscpfe
                 case "RightArrow": return HandlerCommand.RightArrow;
                 case "Backspace": return HandlerCommand.Backspace;
                 case "Enter": return HandlerCommand.Enter;
-                case "Esc": return HandlerCommand.Esc;
+                case "Escape": return HandlerCommand.Esc;
                 case "Home": return HandlerCommand.Home;
                 case "End": return HandlerCommand.End;
                 default:
@@ -213,11 +230,72 @@ namespace sscpfe
     {
         KeyboardHandler kh;
         Buffer buff;
+
+        public string FName { get; private set; }
+
         public SSCPFEApplication()
         {
             Console.SetBufferSize(16000, 16000);
+            Console.ForegroundColor = ConsoleColor.Green;
             kh = new KeyboardHandler();
             buff = new Buffer();
+            FName = "";
+        }
+
+        public SSCPFEApplication(string fname) : this()
+        {
+            FName = fname;
+            if (File.Exists(fname))
+            {
+                using (FileStream stream = new FileStream(fname, FileMode.Open))
+                {
+                    List<string> b = new List<string>();
+                    StreamReader sR = new StreamReader(stream);
+                    string[] arr = sR.ReadToEnd().Split('\n');
+                    for(int i = 0; i < arr.Length; i++)
+                        b.Add(arr[i]);
+                    sR.Close();
+                    Console.WriteLine("Open");
+                    buff.LoadBuff(b);
+                }
+            }
+        }
+
+        void HandleEsc()
+        {
+            Console.SetCursorPosition(buff.DefaultXPos, buff.DefaultYPos + buff.MaxYPos() + 2);
+            Console.Write("Do you want to save current buffer (Y/n) > ");
+            string input = Console.ReadLine();
+            if(input.ToLower() == "y" || input == "")
+            {
+                while (true)
+                {
+                    Console.Write("File name : ");
+                    System.Windows.Forms.SendKeys.SendWait(FName);
+                    FName = Console.ReadLine();
+                    if(FName.Contains("."))
+                    {
+                        string[] FName_p = FName.Split('.');
+                        if(FName_p[FName_p.Length - 1].Length != 0)
+                        {
+                            using (FileStream stream = new FileStream(FName, FileMode.Create))
+                            {
+                                StreamWriter streamWriter = new StreamWriter(stream);
+                                foreach (string str in buff.Buff())
+                                    streamWriter.WriteLine(str);
+                                streamWriter.Close();
+                            }
+                            Console.WriteLine("Done");
+                            break;
+                        }
+                    }
+                }
+                Environment.Exit(0);
+            }
+            else
+            {
+                Environment.Exit(0);
+            }
         }
 
         public void Mainloop()
@@ -247,7 +325,7 @@ namespace sscpfe
                         buff.Enter();
                         break;
                     case HandlerCommand.Esc:
-                        ////////////////
+                        HandleEsc();
                         break;
                     case HandlerCommand.Home:
                         buff.Home();
@@ -262,8 +340,6 @@ namespace sscpfe
                         throw new SSCPFEHandlerException();
                 }
 
-                // handle out of borders
-
             }
         }
     }
@@ -271,7 +347,12 @@ namespace sscpfe
     {
         static void Main(string[] args)
         {
-            SSCPFEApplication app = new SSCPFEApplication();
+            SSCPFEApplication app;
+            if (args.Length != 0)
+                app = new SSCPFEApplication(args[0]);
+            else
+                app = new SSCPFEApplication();
+
             app.Mainloop();
         }
     }
