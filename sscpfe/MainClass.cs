@@ -30,6 +30,7 @@ namespace sscpfe
     class Buffer
     {
         List<string> buff;
+        bool newLineFlag = false;
 
         public Buffer()
         {
@@ -66,6 +67,11 @@ namespace sscpfe
                 Console.WriteLine(buff[i]);
                 buff[i] = buff[i].Split('\0')[0];
             }
+            if (newLineFlag)
+            {
+                newLineFlag = false;
+                buff.RemoveAt(buff.Count - 1);
+            }
             Console.SetCursorPosition(DefaultXPos + XPos, DefaultYPos + YPos);
         }
 
@@ -91,10 +97,12 @@ namespace sscpfe
                 YPos--;
 
                 buff.Add(CreateEmptyLine(1000));
-                // insert empty line as next line*
-                if (YPos != buff.Count - 1)
+                newLineFlag = true;
+                int tmp = YPos + 1;
+                while (tmp != buff.Count - 1)
                 {
-                    buff[YPos + 1] += CreateEmptyLine(len);
+                    buff[tmp] += CreateEmptyLine(1000);
+                    tmp++;
                 }
             }
         }
