@@ -1,0 +1,171 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace sscpfe
+{
+    class Buffer
+    {
+        List<string> buff;
+        bool newLineFlag = false;
+
+        public Buffer()
+        {
+            buff = new List<string>();
+            buff.Add("");
+            XPos = 0;
+            YPos = 0;
+        }
+
+        public Buffer(int DefaultX, int DefaultY) : this()
+        {
+            DefaultXPos = DefaultX;
+            DefaultYPos = DefaultY;
+        }
+
+        public int XPos { get; private set; }
+        public int YPos { get; private set; }
+        public int DefaultXPos { get; private set; }
+        public int DefaultYPos { get; private set; }
+
+        public string this[int i]
+        {
+            get { return buff[i]; }
+        }
+
+        public IEnumerable<string> Buff()
+        {
+            foreach (string str in buff)
+                yield return str;
+        }
+
+        public void LoadBuff(List<string> buff)
+        {
+            this.buff = buff;
+        }
+
+        public int MaxYPos()
+        {
+            return buff.Count;
+        }
+        
+        string CreateEmptyLine(int len)
+        {
+            string line = "";
+            for (int i = 0; i < len; i++)
+                line += "\0";
+            return line;
+        }
+
+        public void Print()
+        {
+            Console.SetCursorPosition(DefaultXPos, DefaultYPos);
+            for(int i = 0; i < buff.Count; i++)
+            {
+                Console.WriteLine(buff[i]);
+                buff[i] = buff[i].Split('\0')[0];
+            }
+            if (newLineFlag)
+            {
+                newLineFlag = false;
+                buff.RemoveAt(buff.Count - 1);
+            }
+            Console.SetCursorPosition(DefaultXPos + XPos, DefaultYPos + YPos);
+        }
+
+        public void Insert(string character)
+        {
+            buff[YPos] = buff[YPos].Insert(XPos++, character);
+        }
+
+        public void Backspace()
+        {
+            if (XPos != 0)
+            {
+                buff[YPos] = buff[YPos].Remove(--XPos, 1);
+                buff[YPos] += (char)0;
+            }
+            else if(YPos != 0)
+            {
+                // delete \n
+                XPos = buff[YPos - 1].Length;
+                int len = buff[YPos].Length;
+                buff[YPos - 1] += buff[YPos];
+                buff.RemoveAt(YPos);
+                YPos--;
+
+                buff.Add(CreateEmptyLine(1000));
+                newLineFlag = true;
+                int tmp = YPos + 1;
+                while (tmp != buff.Count - 1)
+                {
+                    buff[tmp] += CreateEmptyLine(1000);
+                    tmp++;
+                }
+            }
+        }
+
+        public void Enter()
+        {
+            string additionalEmptyString = "";
+            if (YPos + 1 < buff.Count)
+            {
+                additionalEmptyString = CreateEmptyLine(buff[YPos + 1].Length);
+            }
+            buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString);
+            buff[YPos] = buff[YPos].Substring(0, XPos) + CreateEmptyLine(buff[YPos + 1].Length);
+            YPos++;
+            XPos = 0;
+        }
+
+        public void MoveUp()
+        {
+            if (YPos != 0)
+            {
+                YPos--;
+                if (XPos > buff[YPos].Length)
+                    XPos = buff[YPos].Length;
+            }
+        }
+
+        public void MoveDown()
+        {
+            if (YPos < buff.Count - 1)
+            {
+                YPos++;
+                if (XPos > buff[YPos].Length)
+                    XPos = buff[YPos].Length;
+            }
+        }
+
+        public void MoveLeft()
+        {
+            if (XPos != 0)
+            {
+                XPos--;
+            }
+            else if(YPos != 0)
+            {
+                XPos = buff[--YPos].Length;
+            }
+        }
+
+        public void MoveRight()
+        {
+            if (XPos < buff[YPos].Length)
+            {
+                XPos++;
+            }
+        }
+
+        public void Home()
+        {
+            XPos = 0;
+        }
+
+        public void End()
+        {
+            XPos = buff[YPos].Length;
+        }
+
+    }
+}

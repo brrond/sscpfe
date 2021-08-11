@@ -36,7 +36,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Buffer.cs" />
+    <Compile Include="HandlerCommand.cs" />
+    <Compile Include="KeyboardHandler.cs" />
     <Compile Include="MainClass.cs" />
+    <Compile Include="SSCPFEApplication.cs" />
+    <Compile Include="SSCPFEHandlerException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
