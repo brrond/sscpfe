@@ -6,6 +6,11 @@ namespace sscpfe
 {
     class SSCPFEApplication
     {
+        // Prev console settings
+        int bufferWidth, bufferHeight;
+        ConsoleColor cF, cB;
+        int YPos;
+
         KeyboardHandler kh;
         Buffer buff;
 
@@ -13,10 +18,24 @@ namespace sscpfe
 
         public SSCPFEApplication()
         {
+            bufferWidth = Console.BufferWidth;
+            bufferHeight = Console.BufferHeight;
+            cF = Console.ForegroundColor;
+            cB = Console.BackgroundColor;
+            YPos = Console.CursorTop;
+            
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+            {
+                Console.ForegroundColor = cF;
+                Console.BackgroundColor = cB;
+                Console.SetBufferSize(bufferWidth, bufferHeight);
+                Console.SetCursorPosition(0, YPos + buff.MaxYPos() + 5);
+            };
+
             Console.SetBufferSize(16000, 16000);
             Console.ForegroundColor = ConsoleColor.Green;
             kh = new KeyboardHandler();
-            buff = new Buffer();
+            buff = new Buffer(0, YPos);
             FName = "";
         }
 
@@ -56,11 +75,25 @@ namespace sscpfe
                         string[] FName_p = FName.Split('.');
                         if(FName_p[FName_p.Length - 1].Length != 0)
                         {
+                            if(File.Exists(FName))
+                            {
+                                Console.Write(FName + " exists. Do you want to proceed (Y/n) > ");
+                                input = Console.ReadLine();
+                                if (input.ToLower() != "y" && input != "")
+                                    continue;
+                            }
                             using (FileStream stream = new FileStream(FName, FileMode.Create))
                             {
                                 StreamWriter streamWriter = new StreamWriter(stream);
+                                bool first_line = true;
                                 foreach (string str in buff.Buff())
-                                    streamWriter.WriteLine(str);
+                                {
+                                    if(!first_line)
+                                        streamWriter.WriteLine();
+                                    else
+                                        first_line = false;
+                                    streamWriter.Write(str);
+                                }
                                 streamWriter.Close();
                             }
                             Console.WriteLine("Done");
