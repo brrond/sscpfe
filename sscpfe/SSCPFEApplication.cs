@@ -147,6 +147,10 @@ namespace sscpfe
                     case HandlerCommand.Default:
                         buff.Insert("" + kh.LastKeyChar);
                         break;
+                    case HandlerCommand.Ctrl_V:
+                        if (System.Windows.Forms.Clipboard.ContainsText())
+                            buff.Insert(System.Windows.Forms.Clipboard.GetText());
+                        break;
                     default:
                         throw new SSCPFEHandlerException();
                 }

@@ -1,7 +1,10 @@
 ﻿namespace sscpfe
 {
+
     class MainClass
     {
+
+        [System.STAThreadAttribute]
         static void Main(string[] args)
         {
             SSCPFEApplication app;

@@ -23,6 +23,11 @@ namespace sscpfe
                 case "Escape": return HandlerCommand.Esc;
                 case "Home": return HandlerCommand.Home;
                 case "End": return HandlerCommand.End;
+                case "V":
+                case "v":
+                    if (info.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        return HandlerCommand.Ctrl_V;
+                    goto default;
                 default:
                     LastKey = info.Key;
                     LastKeyChar = info.KeyChar;

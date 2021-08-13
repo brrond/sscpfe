@@ -72,9 +72,10 @@ namespace sscpfe
             Console.SetCursorPosition(DefaultXPos + XPos, DefaultYPos + YPos);
         }
 
-        public void Insert(string character)
+        public void Insert(string str)
         {
-            buff[YPos] = buff[YPos].Insert(XPos++, character);
+            buff[YPos] = buff[YPos].Insert(XPos++, str);
+            XPos += str.Length - 1;
         }
 
         public void Backspace()

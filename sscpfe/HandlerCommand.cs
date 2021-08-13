@@ -11,6 +11,7 @@
         Home,
         End,
         Esc,
+        Ctrl_V,
         Default
     }
 }
