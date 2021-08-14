@@ -10,6 +10,7 @@ namespace sscpfe
         int bufferWidth, bufferHeight;
         ConsoleColor cF, cB;
         int YPos;
+        System.Text.Encoding outputEncoding;
 
         KeyboardHandler kh;
         Buffer buff;
@@ -23,6 +24,7 @@ namespace sscpfe
             cF = Console.ForegroundColor;
             cB = Console.BackgroundColor;
             YPos = Console.CursorTop;
+            outputEncoding = Console.OutputEncoding;
             
             AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
             {
@@ -30,10 +32,12 @@ namespace sscpfe
                 Console.BackgroundColor = cB;
                 Console.SetBufferSize(bufferWidth, bufferHeight);
                 Console.SetCursorPosition(0, YPos + buff.MaxYPos() + 5);
+                Console.OutputEncoding = outputEncoding;
             };
 
             Console.SetBufferSize(16000, 16000);
             Console.ForegroundColor = ConsoleColor.Green;
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             kh = new KeyboardHandler();
             buff = new Buffer(0, YPos);
             FName = "";
