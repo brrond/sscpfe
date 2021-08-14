@@ -161,5 +161,12 @@ namespace sscpfe
 
             }
         }
+
+        public static void ShowHelp()
+        {
+            Console.WriteLine("Super simple command promt file editor (sscpfe)");
+            Console.WriteLine("There are no commands actually. Just type 'sscpfe' as command and start entering your text.");
+            Console.WriteLine("Also you can edit file by typing its name after 'sscpfe' command (sscpfe some_text.txt)");
+        }
     }
 }
