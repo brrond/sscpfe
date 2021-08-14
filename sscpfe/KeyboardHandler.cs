@@ -18,7 +18,10 @@ namespace sscpfe
                 case "DownArrow": return HandlerCommand.DownArrow;
                 case "LeftArrow": return HandlerCommand.LeftArrow;
                 case "RightArrow": return HandlerCommand.RightArrow;
-                case "Backspace": return HandlerCommand.Backspace;
+                case "Backspace":
+                    if (info.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        return HandlerCommand.Ctrl_Backspace;
+                    return HandlerCommand.Backspace;
                 case "Enter": return HandlerCommand.Enter;
                 case "Escape": return HandlerCommand.Esc;
                 case "Home": return HandlerCommand.Home;

@@ -105,6 +105,31 @@ namespace sscpfe
             }
         }
 
+        public void Ctrl_Backspace()
+        {
+            if(XPos != 0)
+            {
+                // "some text " => "some "
+                int end_of_the_last_word = -1;
+                for(int i = buff[YPos].Length - 1; i >= 0; i--)
+                {
+                    if(end_of_the_last_word == -1 && buff[YPos][i] != ' ')
+                    {
+                        end_of_the_last_word = i;
+                    }
+                    else if(end_of_the_last_word != -1 && buff[YPos][i] == ' ')
+                    {
+                        int dif = XPos - i;
+                        buff[YPos] = buff[YPos].Remove(i, dif) + CreateEmptyLine(dif + 1);
+                        XPos -= dif;
+                        return; //break;
+                    }
+                }
+                buff[YPos] = CreateEmptyLine(buff[YPos].Length + 1);
+                XPos = 0;
+            }
+        }
+
         public void Enter()
         {
             string additionalEmptyString = "";

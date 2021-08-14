@@ -12,6 +12,7 @@
         End,
         Esc,
         Ctrl_V,
+        Ctrl_Backspace,
         Default
     }
 }

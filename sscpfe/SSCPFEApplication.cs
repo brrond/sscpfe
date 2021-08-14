@@ -155,6 +155,9 @@ namespace sscpfe
                         if (System.Windows.Forms.Clipboard.ContainsText())
                             buff.Insert(System.Windows.Forms.Clipboard.GetText());
                         break;
+                    case HandlerCommand.Ctrl_Backspace:
+                        buff.Ctrl_Backspace();
+                        break;
                     default:
                         throw new SSCPFEHandlerException();
                 }
