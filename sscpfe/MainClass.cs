@@ -1,26 +1,26 @@
 ﻿namespace sscpfe
 {
-
+    // MainClass for sscpfe
     class MainClass
     {
 
         [System.STAThreadAttribute]
         static void Main(string[] args)
         {
-            SSCPFEApplication app;
+            SSCPFEApplication app; // create app
             if (args.Length != 0)
             {
-                if(args[0].ToLower() == "/help" || args[0].ToLower() == "--help")
+                if(args[0].ToLower() == "/help" || args[0].ToLower() == "--help") // help command
                 {
-                    SSCPFEApplication.ShowHelp();
+                    SSCPFEApplication.ShowHelp(); // static method for help
                     return;
                 }
-                app = new SSCPFEApplication(args[0]);
+                app = new SSCPFEApplication(args[0]); // init app with params (f-name)
             }
             else
-                app = new SSCPFEApplication();
+                app = new SSCPFEApplication(); // init app
 
-            app.Mainloop();
+            app.Mainloop(); // start sscpfe
         }
     }
 }

@@ -5,13 +5,14 @@ namespace sscpfe
 {
     class Buffer
     {
-        List<string> buff;
-        bool newLineFlag = false;
+        List<string> buff;          // list of strings
+        bool newLineFlag = false;   // 
 
+        // default const
         public Buffer()
         {
-            buff = new List<string>();
-            buff.Add("");
+            buff = new List<string>();  // empty list of strings
+            buff.Add("");               // not empty actually
             XPos = 0;
             YPos = 0;
         }
@@ -22,32 +23,40 @@ namespace sscpfe
             DefaultYPos = DefaultY;
         }
 
+        // positions of cursor
         public int XPos { get; private set; }
         public int YPos { get; private set; }
+
+        // save for reset (I think)
         public int DefaultXPos { get; private set; }
         public int DefaultYPos { get; private set; }
 
+        // get string by i
         public string this[int i]
         {
             get { return buff[i]; }
         }
 
+        // or loop it
         public IEnumerable<string> Buff()
         {
             foreach (string str in buff)
                 yield return str;
         }
 
+        // load from list
         public void LoadBuff(List<string> buff)
         {
             this.buff = buff;
         }
 
+        // for END
         public int MaxYPos()
         {
             return buff.Count;
         }
         
+        // returns an empty line with size len and has '\0' in the end
         string CreateEmptyLine(int len)
         {
             string line = "";
@@ -56,6 +65,7 @@ namespace sscpfe
             return line;
         }
 
+        // print buffer
         public void Print()
         {
             Console.SetCursorPosition(DefaultXPos, DefaultYPos);
@@ -72,39 +82,43 @@ namespace sscpfe
             Console.SetCursorPosition(DefaultXPos + XPos, DefaultYPos + YPos);
         }
 
+        // insert command (str is actually char)
         public void Insert(string str)
         {
-            buff[YPos] = buff[YPos].Insert(XPos++, str);
-            XPos += str.Length - 1;
+            buff[YPos] = buff[YPos].Insert(XPos++, str);    // insert at XPos
+            XPos += str.Length - 1;                         // add len of str to XPos
         }
 
+        ///////////
         public void Backspace()
         {
             if (XPos != 0)
             {
-                buff[YPos] = buff[YPos].Remove(--XPos, 1);
-                buff[YPos] += (char)0;
+                buff[YPos] = buff[YPos].Remove(--XPos, 1);  // just remove
+                buff[YPos] += (char)0;                      // and add end of line on new end
             }
             else if(YPos != 0)
             {
                 // delete \n
-                XPos = buff[YPos - 1].Length;
-                int len = buff[YPos].Length;
-                buff[YPos - 1] += buff[YPos];
-                buff.RemoveAt(YPos);
-                YPos--;
+                XPos = buff[YPos - 1].Length;   // set new XPos 
+                int len = buff[YPos].Length;    // get len of del string
+                buff[YPos - 1] += buff[YPos];   // add this line to prev
+                buff.RemoveAt(YPos);            // remove line
+                YPos--;                         // set new YPos
 
-                buff.Add(CreateEmptyLine(1000));
-                newLineFlag = true;
-                int tmp = YPos + 1;
-                while (tmp != buff.Count - 1)
+                // I DONT KNOW WHAT THE HECK
+                buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
+                newLineFlag = true;             // ok
+                int tmp = YPos + 1;             // some tmp var
+                while (tmp != buff.Count - 1)   // while not last line
                 {
-                    buff[tmp] += CreateEmptyLine(1000);
+                    buff[tmp] += CreateEmptyLine(1000); // set empty line
                     tmp++;
                 }
             }
         }
 
+        ///////////
         public void Ctrl_Backspace()
         {
             if(XPos != 0)
@@ -133,16 +147,19 @@ namespace sscpfe
         public void Enter()
         {
             string additionalEmptyString = "";
-            if (YPos + 1 < buff.Count)
+            if (YPos + 1 < buff.Count) // if it's last line
             {
-                additionalEmptyString = CreateEmptyLine(buff[YPos + 1].Length);
+                additionalEmptyString = CreateEmptyLine(buff[YPos + 1].Length); // create new empty line next
             }
+
+            // IFJEKFJEKFEJEKFJEKJFKEWJFKEJK
             buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString);
             buff[YPos] = buff[YPos].Substring(0, XPos) + CreateEmptyLine(buff[YPos + 1].Length);
             YPos++;
             XPos = 0;
         }
 
+        // Just change XPos and YPos with conditions
         public void MoveUp()
         {
             if (YPos != 0)
