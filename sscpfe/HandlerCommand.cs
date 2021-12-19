@@ -11,9 +11,11 @@
         Home,
         End,
         Esc,
-        Ctrl_V,
-        Ctrl_Backspace,
+        CtrlV,
+        CtrlBackspace,
         Tab,
+        CtrlDel,
+        Del,
         CtrlLeftArrow,
         CtrlRightArrow,
         Default
