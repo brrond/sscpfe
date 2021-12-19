@@ -21,8 +21,14 @@ namespace sscpfe
             {
                 case "UpArrow": return HandlerCommand.UpArrow;              // move up
                 case "DownArrow": return HandlerCommand.DownArrow;          // 
-                case "LeftArrow": return HandlerCommand.LeftArrow;          //
-                case "RightArrow": return HandlerCommand.RightArrow;        //
+                case "LeftArrow":
+                    if (info.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        return HandlerCommand.CtrlLeftArrow;
+                    return HandlerCommand.LeftArrow;                        //
+                case "RightArrow":
+                    if (info.Modifiers.HasFlag(ConsoleModifiers.Control))
+                        return HandlerCommand.CtrlRightArrow;
+                    return HandlerCommand.RightArrow;                       //
                 case "Backspace":                                           // backspace
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // with control (ctrl + backspace)
                         return HandlerCommand.Ctrl_Backspace;               // regular backspace

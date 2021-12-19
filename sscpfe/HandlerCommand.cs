@@ -14,6 +14,8 @@
         Ctrl_V,
         Ctrl_Backspace,
         Tab,
+        CtrlLeftArrow,
+        CtrlRightArrow,
         Default
     }
 }

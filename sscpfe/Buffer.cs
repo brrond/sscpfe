@@ -247,5 +247,30 @@ namespace sscpfe
             XPos = buff[YPos].Length;
         }
 
+        internal void CtrlLeftArrow()
+        {
+            // place cursor before last word
+            int newCursorPosition = XPos - 1;
+            while(newCursorPosition > 0 && buff[YPos][newCursorPosition] == ' ')
+                newCursorPosition--;
+            while (newCursorPosition > 0 && buff[YPos][newCursorPosition] != ' ')
+                newCursorPosition--;
+
+            if (newCursorPosition == 0)
+                XPos = 0;
+            else
+                XPos = newCursorPosition + 1;
+        }
+
+        internal void CtrlRightArrow()
+        {
+            // place cursor after next word
+            int newCursorPosition = XPos;
+            while (newCursorPosition < buff[YPos].Length && buff[YPos][newCursorPosition] == ' ')
+                newCursorPosition++;
+            while (newCursorPosition < buff[YPos].Length && buff[YPos][newCursorPosition] != ' ')
+                newCursorPosition++;
+            XPos = newCursorPosition;
+        }
     }
 }

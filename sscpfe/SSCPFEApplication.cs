@@ -172,6 +172,12 @@ namespace sscpfe
                     case HandlerCommand.Tab:
                         buff.Insert("    ");
                         break;
+                    case HandlerCommand.CtrlLeftArrow:
+                        buff.CtrlLeftArrow();
+                        break;
+                    case HandlerCommand.CtrlRightArrow:
+                        buff.CtrlRightArrow();
+                        break;
                     default:
                         throw new SSCPFEHandlerException();
                 }
