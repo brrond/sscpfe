@@ -31,6 +31,7 @@ namespace sscpfe
                 case "Escape": return HandlerCommand.Esc;                   // exit
                 case "Home": return HandlerCommand.Home;                    // move
                 case "End": return HandlerCommand.End;                      // move
+                case "Tab": return HandlerCommand.Tab;                      // tab command
                 case "V":                                                   //
                 case "v":                                                   // 
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // has ctrl flag

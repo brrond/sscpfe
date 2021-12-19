@@ -13,6 +13,7 @@
         Esc,
         Ctrl_V,
         Ctrl_Backspace,
+        Tab,
         Default
     }
 }

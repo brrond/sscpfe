@@ -169,6 +169,9 @@ namespace sscpfe
                     case HandlerCommand.Ctrl_Backspace:
                         buff.Ctrl_Backspace();
                         break;
+                    case HandlerCommand.Tab:
+                        buff.Insert("    ");
+                        break;
                     default:
                         throw new SSCPFEHandlerException();
                 }
