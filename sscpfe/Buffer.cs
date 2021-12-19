@@ -230,6 +230,11 @@ namespace sscpfe
             {
                 XPos++;
             }
+            else if(YPos < buff.Count - 1) // if there are some more lines
+            {
+                YPos++;
+                XPos = 0;
+            }
         }
 
         public void Home()
