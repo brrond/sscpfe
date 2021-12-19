@@ -101,7 +101,6 @@ namespace sscpfe
             {
                 // delete \n
                 XPos = buff[YPos - 1].Length;   // set new XPos 
-                int len = buff[YPos].Length;    // get len of del string
                 buff[YPos - 1] += buff[YPos];   // add this line to prev
                 buff.RemoveAt(YPos);            // remove line
                 YPos--;                         // set new YPos
@@ -110,8 +109,8 @@ namespace sscpfe
             }
         }
 
-        // CTRIL+BACKSPACE => delete prev word
-        public void Ctrl_Backspace()
+        // CTRL+BACKSPACE => delete prev word
+        public void CtrlBackspace()
         {
             // if there are words (or blanks)
             if (XPos != 0) 
@@ -154,6 +153,28 @@ namespace sscpfe
             {
                 buff[YPos] = CreateEmptyLine(1);
             }
+        }
+
+        public void Del()
+        {
+            if (XPos != buff[YPos].Length)
+            {
+                buff[YPos] = buff[YPos].Remove(XPos, 1);    // just remove
+                buff[YPos] += (char)0;                      // and add end of line on new end
+            }
+            else if (YPos != buff.Count - 1)
+            {
+                // delete \n
+                buff[YPos] += buff[YPos + 1];   // add next line to this
+                buff.RemoveAt(YPos + 1);        // remove next line
+
+                ClearConsole();
+            }
+        }
+
+        public void CtrlDel()
+        {
+            
         }
 
         void ClearConsole()

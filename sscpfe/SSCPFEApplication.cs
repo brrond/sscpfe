@@ -161,16 +161,22 @@ namespace sscpfe
                     case HandlerCommand.Default:
                         buff.Insert("" + kh.LastKeyChar);
                         break;
-                    case HandlerCommand.Ctrl_V:
+                    case HandlerCommand.CtrlV:
                         // works really bad
                         if (System.Windows.Forms.Clipboard.ContainsText())
                             buff.Insert(System.Windows.Forms.Clipboard.GetText());
                         break;
-                    case HandlerCommand.Ctrl_Backspace:
-                        buff.Ctrl_Backspace();
+                    case HandlerCommand.CtrlBackspace:
+                        buff.CtrlBackspace();
                         break;
                     case HandlerCommand.Tab:
                         buff.Insert("    ");
+                        break;
+                    case HandlerCommand.CtrlDel:
+                        buff.CtrlDel();
+                        break;
+                    case HandlerCommand.Del:
+                        buff.Del();
                         break;
                     default:
                         throw new SSCPFEHandlerException();
