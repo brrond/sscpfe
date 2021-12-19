@@ -106,15 +106,7 @@ namespace sscpfe
                 buff.RemoveAt(YPos);            // remove line
                 YPos--;                         // set new YPos
 
-                // I DONT KNOW WHAT THE HECK
-                buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
-                newLineFlag = true;             // ok
-                int tmp = YPos + 1;             // some tmp var
-                while (tmp != buff.Count - 1)   // while not last line
-                {
-                    buff[tmp] += CreateEmptyLine(1000); // set empty line
-                    tmp++;
-                }
+                ClearConsole();
             }
         }
 
@@ -164,6 +156,19 @@ namespace sscpfe
             }
         }
 
+        void ClearConsole()
+        {
+            // I DONT KNOW WHAT THE HECK
+            buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
+            newLineFlag = true;             // ok
+            int tmp = YPos + 1;             // some tmp var
+            while (tmp != buff.Count - 1)   // while not last line
+            {
+                buff[tmp] += CreateEmptyLine(1000); // set empty line
+                tmp++;
+            }
+        }
+
         public void Enter()
         {
             string additionalEmptyString = "";
@@ -172,11 +177,18 @@ namespace sscpfe
                 additionalEmptyString = CreateEmptyLine(buff[YPos + 1].Length); // create new empty line next
             }
 
-            // IFJEKFJEKFEJEKFJEKJFKEWJFKEJK
-            buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString);
-            buff[YPos] = buff[YPos].Substring(0, XPos) + CreateEmptyLine(buff[YPos + 1].Length);
-            YPos++;
-            XPos = 0;
+            // it's not last line
+            buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString); // split lines
+            buff[YPos] = buff[YPos].Substring(0, XPos) + CreateEmptyLine(buff[YPos + 1].Length); // delete garbage
+            YPos++; // new line
+            XPos = 0; // new position
+
+            // there is still one problem.
+            // If we splited string (or just added one)
+            // we still need to remove garbage 
+            // from next strings
+            // Thats why:
+            ClearConsole();
         }
 
         // Just change XPos and YPos with conditions
