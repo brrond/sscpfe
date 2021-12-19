@@ -118,29 +118,49 @@ namespace sscpfe
             }
         }
 
-        ///////////
+        // CTRIL+BACKSPACE => delete prev word
         public void Ctrl_Backspace()
         {
-            if(XPos != 0)
+            // if there are words (or blanks)
+            if (XPos != 0) 
             {
+                // all possible variants:
                 // "some text " => "some "
-                int end_of_the_last_word = -1;
-                for(int i = buff[YPos].Length - 1; i >= 0; i--)
+                // "some text" => "some "
+                int startOfThePrevWord = XPos - 1;
+                while (startOfThePrevWord != 0 && buff[YPos][startOfThePrevWord] == ' ')
+                        startOfThePrevWord--;
+
+                int deleteFromHere = 0;
+                int howManyToDelete = XPos;
+                int newStart = 0;
+
+                // either we reached the begining of the line
+                if(startOfThePrevWord != 0)
                 {
-                    if(end_of_the_last_word == -1 && buff[YPos][i] != ' ')
+                    // find the begining of this word
+                    while (startOfThePrevWord != 0 && buff[YPos][startOfThePrevWord] != ' ')
+                        startOfThePrevWord--;
+
+                    // either it's begining of the word
+                    if (startOfThePrevWord != 0)
                     {
-                        end_of_the_last_word = i;
-                    }
-                    else if(end_of_the_last_word != -1 && buff[YPos][i] == ' ')
-                    {
-                        int dif = XPos - i;
-                        buff[YPos] = buff[YPos].Remove(i, dif) + CreateEmptyLine(dif + 1);
-                        XPos -= dif;
-                        return; //break;
+                        startOfThePrevWord++;
+                        int dif = XPos - startOfThePrevWord;
+                        deleteFromHere = startOfThePrevWord;
+                        howManyToDelete = dif;
+                        newStart = startOfThePrevWord;
                     }
                 }
-                buff[YPos] = CreateEmptyLine(buff[YPos].Length + 1);
-                XPos = 0;
+                // or we in prev word
+                // or it's end (begining) of the line
+                buff[YPos] = buff[YPos].Remove(deleteFromHere, howManyToDelete) + CreateEmptyLine(howManyToDelete + 1);
+                XPos = newStart;
+            }
+            // delete some inappropriate symbol
+            else if (buff[YPos].Length == 0)
+            {
+                buff[YPos] = CreateEmptyLine(1);
             }
         }
 
