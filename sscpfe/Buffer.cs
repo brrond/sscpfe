@@ -174,7 +174,39 @@ namespace sscpfe
 
         public void CtrlDel()
         {
-            
+            // if there are words (or blanks)
+            if (XPos != buff[YPos].Length)
+            {
+                int endOfTheNextWord = XPos + 1;
+                while (endOfTheNextWord != buff[YPos].Length && buff[YPos][endOfTheNextWord] == ' ')
+                    endOfTheNextWord++;
+
+                int howManyToDelete = buff[YPos].Length - XPos;
+
+                // either we reached the end of the line
+                if (endOfTheNextWord != buff[YPos].Length)
+                {
+                    // find the end of this word
+                    while (endOfTheNextWord != buff[YPos].Length && buff[YPos][endOfTheNextWord] != ' ')
+                        endOfTheNextWord++;
+
+                    // either it's end of the word
+                    if (endOfTheNextWord != buff[YPos].Length)
+                    {
+                        //endOfTheNextWord++;
+                        int dif = endOfTheNextWord - XPos + 1;
+                        howManyToDelete = dif;
+                    }
+                }
+                // or we in prev word
+                // or it's end (begining) of the line
+                buff[YPos] = buff[YPos].Remove(XPos, howManyToDelete) + CreateEmptyLine(howManyToDelete + 1);
+            }
+            // delete some inappropriate symbol
+            else if (buff[YPos].Length == 0)
+            {
+                buff[YPos] = CreateEmptyLine(1);
+            }
         }
 
         void ClearConsole()
@@ -268,7 +300,7 @@ namespace sscpfe
             XPos = buff[YPos].Length;
         }
 
-        internal void CtrlLeftArrow()
+        public void CtrlLeftArrow()
         {
             // place cursor before last word
             int newCursorPosition = XPos - 1;
@@ -283,7 +315,7 @@ namespace sscpfe
                 XPos = newCursorPosition + 1;
         }
 
-        internal void CtrlRightArrow()
+        public void CtrlRightArrow()
         {
             // place cursor after next word
             int newCursorPosition = XPos;
