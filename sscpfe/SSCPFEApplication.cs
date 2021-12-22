@@ -8,9 +8,11 @@ namespace sscpfe
     {
         // Prev console config
         int YPos;
+        string title;
         int bufferWidth;
         int bufferHeight;
         ConsoleColor cF, cB;
+        System.Text.Encoding inputEncoding;
         System.Text.Encoding outputEncoding;
 
         // 
@@ -29,8 +31,10 @@ namespace sscpfe
             cF = Console.ForegroundColor;
             cB = Console.BackgroundColor;
             YPos = Console.CursorTop;
+            inputEncoding = Console.InputEncoding;
             outputEncoding = Console.OutputEncoding;
-            
+            title = Console.Title;
+
             // when application is closed return prev console config
             AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
             {
@@ -39,12 +43,16 @@ namespace sscpfe
                 Console.SetBufferSize(bufferWidth, bufferHeight);
                 Console.SetCursorPosition(0, YPos + buff.MaxYPos() + 5);
                 Console.OutputEncoding = outputEncoding;
+                Console.InputEncoding = inputEncoding;
+                Console.Title = title;
             };
 
             // set new config
-            Console.SetBufferSize(16000, 16000); // I don't know why value so high
+            Console.SetBufferSize(16000, 16000); // I don't know why value so "high"
             Console.ForegroundColor = ConsoleColor.Green; // I watched Matrix recently
             Console.OutputEncoding = System.Text.Encoding.UTF8; // UTF-8 encoding
+            Console.InputEncoding = System.Text.Encoding.UTF8;
+            Console.Title = "sscpfe";
 
             kh = new KeyboardHandler(); // init KeyboardHandler
             buff = new Buffer(0, YPos); // init Buffer
@@ -54,20 +62,56 @@ namespace sscpfe
         public SSCPFEApplication(string fname) : this()
         {
             FName = fname; // we have some file to work with
-            if (File.Exists(fname))
+            if(Read(fname))
+                Console.Title = "sscpfe - " + FName;
+        }
+
+        bool Read(string fname)
+        {
+            try
             {
-                using (FileStream stream = new FileStream(fname, FileMode.Open)) // try to open it
+                if (File.Exists(fname))
                 {
-                    List<string> b = new List<string>();        // tmp buffer
-                    StreamReader sR = new StreamReader(stream); // open stream reader
-                    string[] arr = sR.ReadToEnd().Split('\n');  // read everything and split by line
-                    for(int i = 0; i < arr.Length; i++)         // add every line in b
-                        b.Add(arr[i]);
-                    sR.Close();                                 // close stream
-                    //Console.WriteLine("Open");                // debug info (actually bad idea)
-                    buff.LoadBuff(b);                           // load file into buffer
+                    using (FileStream stream = new FileStream(fname, FileMode.Open)) // try to open it
+                    {
+                        List<string> b = new List<string>();        // tmp buffer
+                        StreamReader sR = new StreamReader(stream); // open stream reader
+                        string[] arr = sR.ReadToEnd().Split('\n');  // read everything and split by line
+                        for (int i = 0; i < arr.Length; i++)         // add every line in b
+                            b.Add(arr[i]);
+                        sR.Close();                                 // close stream
+                                                                    //Console.WriteLine("Open");                // debug info (actually bad idea)
+                        buff.LoadBuff(b);                           // load file into buffer
+                    }
+                    return true;
                 }
             }
+            catch { }
+            return false;
+        }
+
+        bool Write(string fname)
+        {
+            try
+            {
+                using (FileStream stream = new FileStream(fname, FileMode.Create)) // open file stream
+                {
+                    StreamWriter streamWriter = new StreamWriter(stream);   // open stream writer
+                    bool first_line = true;                                 // first_line ? (we should some how '\n')
+                    foreach (string str in buff.Buff())
+                    {
+                        if (!first_line)
+                            streamWriter.WriteLine();
+                        else
+                            first_line = false;
+                        streamWriter.Write(str);
+                    }
+                    streamWriter.Close();                                   // close stream writer
+                }
+                return true;
+            }
+            catch { }
+            return false;
         }
 
         void HandleEsc()
@@ -95,20 +139,7 @@ namespace sscpfe
                                 if (input.ToLower() != "y" && input != "") // interesting if here (it's ok tho)
                                     continue;
                             }
-                            using (FileStream stream = new FileStream(FName, FileMode.Create)) // open file stream
-                            {
-                                StreamWriter streamWriter = new StreamWriter(stream);   // open stream writer
-                                bool first_line = true;                                 // first_line ? (we should some how '\n')
-                                foreach (string str in buff.Buff())
-                                {
-                                    if(!first_line)
-                                        streamWriter.WriteLine();
-                                    else
-                                        first_line = false;
-                                    streamWriter.Write(str);
-                                }
-                                streamWriter.Close();                                   // close stream writer
-                            }
+                            Write(FName);
                             Console.WriteLine("Done");                                  // done
                             break;
                         }
