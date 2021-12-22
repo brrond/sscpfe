@@ -268,7 +268,7 @@ namespace sscpfe
             XPos = buff[YPos].Length;
         }
 
-        internal void CtrlLeftArrow()
+        public void CtrlLeftArrow()
         {
             // place cursor before last word
             int newCursorPosition = XPos - 1;
@@ -283,7 +283,7 @@ namespace sscpfe
                 XPos = newCursorPosition + 1;
         }
 
-        internal void CtrlRightArrow()
+        public void CtrlRightArrow()
         {
             // place cursor after next word
             int newCursorPosition = XPos;
