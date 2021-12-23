@@ -1,6 +1,6 @@
 ﻿namespace sscpfe
 {
-    enum HandlerCommand
+    enum KeyboardHandlerCommand
     {
         UpArrow,
         DownArrow,

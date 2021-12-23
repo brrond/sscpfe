@@ -14,45 +14,45 @@ namespace sscpfe
         }
 
         // return some of HandlerCommand enum element
-        public HandlerCommand Handle()
+        public KeyboardHandlerCommand Handle()
         {
             ConsoleKeyInfo info = Console.ReadKey();                        // get user key
             switch(info.Key.ToString())                                     // if it's
             {
-                case "UpArrow": return HandlerCommand.UpArrow;              // move up
-                case "DownArrow": return HandlerCommand.DownArrow;          // 
+                case "UpArrow": return KeyboardHandlerCommand.UpArrow;              // move up
+                case "DownArrow": return KeyboardHandlerCommand.DownArrow;          // 
                 case "LeftArrow":
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // 
-                        return HandlerCommand.CtrlLeftArrow;                // move left one word
-                    return HandlerCommand.LeftArrow;                        // move left one char
+                        return KeyboardHandlerCommand.CtrlLeftArrow;                // move left one word
+                    return KeyboardHandlerCommand.LeftArrow;                        // move left one char
                 case "RightArrow":
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   
-                        return HandlerCommand.CtrlRightArrow;               // move right one word
-                    return HandlerCommand.RightArrow;                       // move left one char
+                        return KeyboardHandlerCommand.CtrlRightArrow;               // move right one word
+                    return KeyboardHandlerCommand.RightArrow;                       // move left one char
                 case "Backspace":                                           // backspace
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // with control (ctrl + backspace)
-                        return HandlerCommand.CtrlBackspace;               
-                    return HandlerCommand.Backspace;                        // regular backspace
+                        return KeyboardHandlerCommand.CtrlBackspace;               
+                    return KeyboardHandlerCommand.Backspace;                        // regular backspace
                 case "Delete":                                              // delete
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // with control (del + backspace)
-                        return HandlerCommand.CtrlDel;
-                    return HandlerCommand.Del;                              // regular del
-                case "Enter": return HandlerCommand.Enter;                  // new line
-                case "Escape": return HandlerCommand.Esc;                   // exit
-                case "Home": return HandlerCommand.Home;                    // move
-                case "End": return HandlerCommand.End;                      // move
-                case "Tab": return HandlerCommand.Tab;                      // tab command
+                        return KeyboardHandlerCommand.CtrlDel;
+                    return KeyboardHandlerCommand.Del;                              // regular del
+                case "Enter": return KeyboardHandlerCommand.Enter;                  // new line
+                case "Escape": return KeyboardHandlerCommand.Esc;                   // exit
+                case "Home": return KeyboardHandlerCommand.Home;                    // move
+                case "End": return KeyboardHandlerCommand.End;                      // move
+                case "Tab": return KeyboardHandlerCommand.Tab;                      // tab command
                 case "V":                                                   //
                 case "v":                                                   // 
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // has ctrl flag
-                        return HandlerCommand.CtrlV;                       // ctrl + V
+                        return KeyboardHandlerCommand.CtrlV;                       // ctrl + V
                     goto default;
                 default:
                     LastKey = info.Key;                                     // insert
                     LastKeyChar = info.KeyChar;                             // this char
                     break;
             }
-            return HandlerCommand.Default;                                  // default status
+            return KeyboardHandlerCommand.Default;                                  // default status
         }
 
         public ConsoleKey LastKey { get; private set; }

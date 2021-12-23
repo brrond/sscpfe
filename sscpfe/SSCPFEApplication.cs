@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace sscpfe
 {
@@ -12,8 +13,11 @@ namespace sscpfe
         int bufferWidth;
         int bufferHeight;
         ConsoleColor cF, cB;
-        System.Text.Encoding inputEncoding;
-        System.Text.Encoding outputEncoding;
+        Encoding inputEncoding;
+        Encoding outputEncoding;
+
+        // New console config
+        Encoding encoding = Encoding.UTF8;
 
         // 
         Buffer buff;
@@ -50,8 +54,8 @@ namespace sscpfe
             // set new config
             Console.SetBufferSize(16000, 16000); // I don't know why value so "high"
             Console.ForegroundColor = ConsoleColor.Green; // I watched Matrix recently
-            Console.OutputEncoding = System.Text.Encoding.UTF8; // UTF-8 encoding
-            Console.InputEncoding = System.Text.Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8; // UTF-8 encoding
+            Console.InputEncoding = Encoding.UTF8;
             Console.Title = "sscpfe";
 
             kh = new KeyboardHandler(); // init KeyboardHandler
@@ -59,10 +63,18 @@ namespace sscpfe
             FName = ""; // there is no file (means new file will be created)
         }
 
-        public SSCPFEApplication(string fname) : this()
+        public SSCPFEApplication(string fname) : this(fname, Encoding.UTF8)
         {
+            
+        }
+
+        public SSCPFEApplication(string fname, Encoding encoding) : this()
+        {
+            this.encoding = encoding;
+            Console.OutputEncoding = encoding;
+            Console.InputEncoding = encoding;
             FName = fname; // we have some file to work with
-            if(Read(fname))
+            if (Read(fname))
                 Console.Title = "sscpfe - " + FName;
         }
 
@@ -75,7 +87,7 @@ namespace sscpfe
                     using (FileStream stream = new FileStream(fname, FileMode.Open)) // try to open it
                     {
                         List<string> b = new List<string>();        // tmp buffer
-                        StreamReader sR = new StreamReader(stream); // open stream reader
+                        StreamReader sR = new StreamReader(stream, encoding); // open stream reader
                         string[] arr = sR.ReadToEnd().Split('\n');  // read everything and split by line
                         for (int i = 0; i < arr.Length; i++)         // add every line in b
                             b.Add(arr[i]);
@@ -96,7 +108,7 @@ namespace sscpfe
             {
                 using (FileStream stream = new FileStream(fname, FileMode.Create)) // open file stream
                 {
-                    StreamWriter streamWriter = new StreamWriter(stream);   // open stream writer
+                    StreamWriter streamWriter = new StreamWriter(stream, encoding);   // open stream writer
                     bool first_line = true;                                 // first_line ? (we should some how '\n')
                     foreach (string str in buff.Buff())
                     {
@@ -162,57 +174,57 @@ namespace sscpfe
 
                 switch (kh.Handle()) // get input from user
                 {
-                    case HandlerCommand.UpArrow:
+                    case KeyboardHandlerCommand.UpArrow:
                         buff.MoveUp();
                         break;
-                    case HandlerCommand.DownArrow:
+                    case KeyboardHandlerCommand.DownArrow:
                         buff.MoveDown();
                         break;
-                    case HandlerCommand.LeftArrow:
+                    case KeyboardHandlerCommand.LeftArrow:
                         buff.MoveLeft();
                         break;
-                    case HandlerCommand.RightArrow:
+                    case KeyboardHandlerCommand.RightArrow:
                         buff.MoveRight();
                         break;
-                    case HandlerCommand.Backspace:
+                    case KeyboardHandlerCommand.Backspace:
                         buff.Backspace();
                         break;
-                    case HandlerCommand.Enter:
+                    case KeyboardHandlerCommand.Enter:
                         buff.Enter();
                         break;
-                    case HandlerCommand.Esc:
+                    case KeyboardHandlerCommand.Esc:
                         HandleEsc();
                         break;
-                    case HandlerCommand.Home:
+                    case KeyboardHandlerCommand.Home:
                         buff.Home();
                         break;
-                    case HandlerCommand.End:
+                    case KeyboardHandlerCommand.End:
                         buff.End();
                         break;
-                    case HandlerCommand.Default:
+                    case KeyboardHandlerCommand.Default:
                         buff.Insert("" + kh.LastKeyChar);
                         break;
-                    case HandlerCommand.CtrlV:
+                    case KeyboardHandlerCommand.CtrlV:
                         // works really bad
                         if (System.Windows.Forms.Clipboard.ContainsText())
                             buff.Insert(System.Windows.Forms.Clipboard.GetText());
                         break;
-                    case HandlerCommand.CtrlBackspace:
+                    case KeyboardHandlerCommand.CtrlBackspace:
                         buff.CtrlBackspace();
                         break;
-                    case HandlerCommand.Tab:
+                    case KeyboardHandlerCommand.Tab:
                         buff.Insert("    ");
                         break;
-                    case HandlerCommand.CtrlLeftArrow:
+                    case KeyboardHandlerCommand.CtrlLeftArrow:
                         buff.CtrlLeftArrow();
                         break;
-                    case HandlerCommand.CtrlRightArrow:
+                    case KeyboardHandlerCommand.CtrlRightArrow:
                         buff.CtrlRightArrow();
                         break;
-                    case HandlerCommand.CtrlDel:
+                    case KeyboardHandlerCommand.CtrlDel:
                         buff.CtrlDel();
                         break;
-                    case HandlerCommand.Del:
+                    case KeyboardHandlerCommand.Del:
                         buff.Del();
                         break;
                     default:
@@ -222,11 +234,5 @@ namespace sscpfe
             }
         }
 
-        public static void ShowHelp()
-        {
-            Console.WriteLine("Super simple command promt file editor (sscpfe)");
-            Console.WriteLine("There are no commands actually. Just type 'sscpfe' as command and start entering your text.");
-            Console.WriteLine("Also you can edit file by typing its name after 'sscpfe' command (sscpfe some_text.txt)");
-        }
     }
 }
