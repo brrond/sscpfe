@@ -15,7 +15,7 @@ namespace sscpfe
 
         public void Run()
         {
-            SSCPFEApplication app = null; // create app
+            IApp app = null; // create app
             switch (handleARGS())
             {
                 case ARGSHandlerCommand.DEFAULT:
@@ -37,7 +37,7 @@ namespace sscpfe
             }
             
             if(app != null)
-                app.Mainloop(); // start sscpfe
+                app.Mainloop(); // start app
         }
 
         private Encoding ParseEncoding(string str)
@@ -61,7 +61,7 @@ namespace sscpfe
             //sscpfe file_name                  // DONE
             //sscpfe /help                      // DONE
             //sscpfe /b file_name
-            //sscpfe /e encoding file_name
+            //sscpfe /e encoding file_name      // DONE
             //sscpfe jkfajfkejfeifjeiffjeifj    // DONE
             if (args.Length != 0)
             {

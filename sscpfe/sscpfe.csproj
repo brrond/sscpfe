@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffer.cs" />
+    <Compile Include="IApp.cs" />
     <Compile Include="KeyboardHandlerCommand.cs" />
     <Compile Include="KeyboardHandler.cs" />
     <Compile Include="MainClass.cs" />

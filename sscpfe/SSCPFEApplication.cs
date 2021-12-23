@@ -5,7 +5,7 @@ using System.Text;
 
 namespace sscpfe
 {
-    class SSCPFEApplication
+    class SSCPFEApplication : IApp
     {
         // Prev console config
         int YPos;
