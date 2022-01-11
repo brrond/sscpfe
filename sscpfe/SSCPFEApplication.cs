@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace sscpfe
 {
@@ -63,7 +64,7 @@ namespace sscpfe
             FName = ""; // there is no file (means new file will be created)
         }
 
-        public SSCPFEApplication(string fname) : this(fname, Encoding.UTF8)
+        public SSCPFEApplication(string fname) : this(fname, new UTF8Encoding(false))
         {
             
         }
@@ -126,35 +127,55 @@ namespace sscpfe
             return false;
         }
 
+        bool AskUser(string msg)
+        {
+            bool res = true;
+            do
+            {
+                Console.Write(msg);
+                string key = Console.ReadKey().Key.ToString().ToLower().Trim();
+                if (key == "y")
+                {
+                    res = true;
+                    break;
+                }
+                else if (key == "n")
+                {
+                    res = false;
+                    break;
+                }
+
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write(new string(' ', msg.Length + 1));
+                Console.SetCursorPosition(0, Console.CursorTop);
+
+            } while (true);
+            Console.WriteLine();
+            return res;
+        }
+
         void HandleEsc()
         {
             // user pressed ESC
             Console.SetCursorPosition(buff.DefaultXPos, buff.DefaultYPos + buff.MaxYPos() + 2);
-            Console.Write("Do you want to save current buffer (Y/n) > ");
-            string input = Console.ReadLine();
-            if(input.ToLower() == "y" || input == "") // simple handle
+            if (AskUser("Do you want to save current buffer (Y/n) > ")) // simple handle
             {
+                Regex fileNameRegex = new Regex("[a-zA-Z0-9\\-. _]*\\.[a-zA-Z0-9\\-. _]+");
                 while (true) // loop so user WILL enter file name
                 {
                     Console.Write("File name : ");
                     System.Windows.Forms.SendKeys.SendWait(FName); // if we have fname
                     FName = Console.ReadLine();
-                    if(FName.Contains(".")) // if we have extension
+                    if (fileNameRegex.IsMatch(FName)) // if we have right extension
                     {
-                        string[] FName_p = FName.Split('.'); // get name and extension
-                        if(FName_p[FName_p.Length - 1].Length != 0) // make sure everything is right with extension (after last .)
+                        if(File.Exists(FName)) // if exist we should ask user to save
                         {
-                            if(File.Exists(FName)) // if exist we should ask user to save
-                            {
-                                Console.Write(FName + " exists. Do you want to proceed (Y/n) > ");
-                                input = Console.ReadLine();
-                                if (input.ToLower() != "y" && input != "") // interesting if here (it's ok tho)
-                                    continue;
-                            }
-                            Write(FName);
-                            Console.WriteLine("Done");                                  // done
-                            break;
+                            if (!AskUser(FName + " exists. Do you want to proceed (Y/n) > "))
+                                continue;
                         }
+                        Write(FName);
+                        Console.WriteLine("Done");  // done
+                        break;
                     }
                 }
                 Environment.Exit(0);                                                    // hard di... exit
