@@ -6,8 +6,8 @@
      * Backspace        => Place cursor in position after and insert(del_char)
      * Del              => Place cursor in position (before == after) and insert(del_char) 
      * 
-     * Enter            => Place cursor in postion after and delete()
-     * Insert (Default) => Place cursor in position after and delete()
+     * Enter            => Place cursor in postion after and backspace()
+     * Insert (Default) => Place cursor in position after and backspace()
      * 
      * CtrlBackspace    => Place cursor in position after and insert(del_charS)
      * CtrlDel          => Place cursor in position (before == after) and insert(del_charS)

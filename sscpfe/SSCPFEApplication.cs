@@ -56,9 +56,33 @@ namespace sscpfe
         public override OperationInfo Undo()
         {
             Type buffType = typeof(Buffer);
-            MethodInfo methodInfo = buffType.GetMethod("Insert");
+            if (ch == '\n')
+            {
+                MethodInfo methodInfo = buffType.GetMethod("Enter");
+                return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
+                    new object[] { });
+            }
+            else
+            {
+                MethodInfo methodInfo = buffType.GetMethod("Insert");
+                return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
+                    new object[] { ch.ToString() });
+            }
+        }
+    }
+
+    class InsertOperation : Operation
+    {
+        public InsertOperation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter) : base(XPosBefore, YPosBefore, XPosAfter, YPosAfter)
+        {
+        }
+
+        public override OperationInfo Undo()
+        {
+            Type buffType = typeof(Buffer);
+            MethodInfo methodInfo = buffType.GetMethod("Backspace");
             return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
-                new object[] { ch });
+                new object[] { });
         }
     }
 
@@ -83,7 +107,19 @@ namespace sscpfe
         }
         public void Add(Operation operation)
         {
+           if(Curr != null && Curr != operations.Last) // for redo
+            {
+                // delete after curr
+                while (Curr.Next != null)
+                {
+                    operations.Remove(Curr.Next);
+                }
 
+                if (operations.Count == 0)
+                    Curr = null;
+            }
+            operations.AddLast(operation);
+            Curr = operations.Last;
         }
     }
 
@@ -143,6 +179,7 @@ namespace sscpfe
 
             kh = new KeyboardHandler(); // init KeyboardHandler
             buff = new Buffer(0, YPos); // init Buffer
+            operations = new OperationList();
             FName = ""; // there is no file (means new file will be created)
         }
 
@@ -275,8 +312,11 @@ namespace sscpfe
                 // print buffer (bad but)
                 buff.Print();
 
+                // For undo/redo
                 int xPosBefore = buff.XPos;
                 int yPosBefore = buff.YPos;
+                char currChar = '\n';        // TODO: Fix no element in redo del op
+                                             // if there's no element that's problem
 
                 switch (kh.Handle()) // get input from user
                 {
@@ -293,13 +333,15 @@ namespace sscpfe
                         buff.MoveRight();
                         break;
                     case KeyboardHandlerCommand.Backspace:
-                        char ch = buff[buff.YPos][buff.XPos];
+                        if (xPosBefore != 0)
+                            currChar = buff[yPosBefore][xPosBefore - 1];
                         buff.Backspace();
                         operations.Add(new DeleteOperation(xPosBefore, yPosBefore,
-                            buff.XPos, buff.YPos, ch));
+                            buff.XPos, buff.YPos, currChar));
                         break;
                     case KeyboardHandlerCommand.Enter:
                         buff.Enter();
+                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos));
                         break;
                     case KeyboardHandlerCommand.Esc:
                         HandleEsc();
@@ -312,6 +354,7 @@ namespace sscpfe
                         break;
                     case KeyboardHandlerCommand.Default:
                         buff.Insert("" + kh.LastKeyChar);
+                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos));
                         break;
                     case KeyboardHandlerCommand.CtrlV:
                         // works really bad
@@ -334,7 +377,11 @@ namespace sscpfe
                         buff.CtrlDel();
                         break;
                     case KeyboardHandlerCommand.Del:
+                        if (xPosBefore != buff[yPosBefore].Length)
+                            currChar = buff[yPosBefore][xPosBefore];
                         buff.Del();
+                        operations.Add(new DeleteOperation(xPosBefore, yPosBefore,
+                            buff.XPos, buff.YPos, currChar));
                         break;
                     case KeyboardHandlerCommand.CtrlZ:
                         if (operations.Curr != null)
