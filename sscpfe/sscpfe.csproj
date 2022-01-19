@@ -59,11 +59,13 @@
     <Compile Include="ARGSHandlerCommand.cs" />
     <Compile Include="SSCPFEApplication.cs" />
     <Compile Include="SSCPFEBinaryReaderApplication.cs" />
+    <Compile Include="SSCPFEConfigurationApplication.cs" />
     <Compile Include="SSCPFEHandlerException.cs" />
     <Compile Include="SSCPFERunner.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>

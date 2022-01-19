@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace sscpfe
@@ -234,7 +234,7 @@ namespace sscpfe
                         buff.CtrlBackspace();
                         break;
                     case KeyboardHandlerCommand.Tab:
-                        buff.Insert("    ");
+                        buff.Insert(new string(' ', SSCPFEConfigurationApplication.GetTabSize()));
                         break;
                     case KeyboardHandlerCommand.CtrlLeftArrow:
                         buff.CtrlLeftArrow();
