@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace sscpfe
 {
+
     class Buffer
     {
         List<string> buff;          // list of strings
-        bool newLineFlag = false;   // 
+        bool newLineFlag = false;   // new line problem
 
-        // default const
         public Buffer()
         {
             buff = new List<string>();  // empty list of strings
@@ -325,5 +326,18 @@ namespace sscpfe
                 newCursorPosition++;
             XPos = newCursorPosition;
         }
+
+        public void PerformOperation(OperationInfo oi)
+        {
+            int r = oi.Repeats;
+            XPos = oi.XPos;
+            YPos = oi.YPos;
+            while(r > 0)
+            {
+                oi.Method.Invoke(this, oi.Parametrs);
+                r--;
+            }
+        }
+
     }
 }

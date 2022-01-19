@@ -3,9 +3,90 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace sscpfe
 {
+
+    class OperationInfo
+    {
+        public int XPos { get; private set; }
+        public int YPos { get; private set; }
+        public int Repeats { get; private set; }
+        public MethodInfo Method { get; private set; }
+        public object[] Parametrs { get; private set; }
+
+        public OperationInfo(int xPos, int yPos, int repeats, MethodInfo method, object[] parametrs)
+        {
+            XPos = xPos;
+            YPos = yPos;
+            Repeats = repeats;
+            Method = method;
+            Parametrs = parametrs;
+        }
+    }
+
+    abstract class Operation
+    {
+        protected int xPosBefore, yPosBefore;
+        protected int xPosAfter, yPosAfter;
+
+        public Operation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter)
+        {
+            xPosBefore = XPosBefore;
+            yPosBefore = YPosBefore;
+            xPosAfter = XPosAfter;
+            yPosAfter = YPosAfter;
+        }
+
+        abstract public OperationInfo Undo();
+
+        //abstract public void Redo();
+    }
+
+    class DeleteOperation : Operation
+    {
+        char ch;
+        public DeleteOperation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter, char Ch) :
+            base(XPosBefore, YPosBefore, XPosAfter, YPosAfter)
+        {
+            ch = Ch;
+        }
+
+        public override OperationInfo Undo()
+        {
+            Type buffType = typeof(Buffer);
+            MethodInfo methodInfo = buffType.GetMethod("Insert");
+            return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
+                new object[] { ch });
+        }
+    }
+
+    class OperationList
+    {
+        LinkedList<Operation> operations;
+        public LinkedListNode<Operation> Curr { get; private set; } = null;
+        public OperationList()
+        {
+            operations = new LinkedList<Operation>();
+        }
+        public void Prev()
+        {
+            if(Curr != null)
+                Curr = Curr.Previous;
+        }
+
+        public void Next()
+        {
+            if(Curr != null)
+                Curr = Curr.Next;
+        }
+        public void Add(Operation operation)
+        {
+
+        }
+    }
+
     class SSCPFEApplication : IApp
     {
         // Prev console config
@@ -23,6 +104,7 @@ namespace sscpfe
         // 
         Buffer buff;
         KeyboardHandler kh;
+        OperationList operations;
 
         // curr file name
         public string FName { get; private set; }
@@ -193,6 +275,9 @@ namespace sscpfe
                 // print buffer (bad but)
                 buff.Print();
 
+                int xPosBefore = buff.XPos;
+                int yPosBefore = buff.YPos;
+
                 switch (kh.Handle()) // get input from user
                 {
                     case KeyboardHandlerCommand.UpArrow:
@@ -208,7 +293,10 @@ namespace sscpfe
                         buff.MoveRight();
                         break;
                     case KeyboardHandlerCommand.Backspace:
+                        char ch = buff[buff.YPos][buff.XPos];
                         buff.Backspace();
+                        operations.Add(new DeleteOperation(xPosBefore, yPosBefore,
+                            buff.XPos, buff.YPos, ch));
                         break;
                     case KeyboardHandlerCommand.Enter:
                         buff.Enter();
@@ -247,6 +335,16 @@ namespace sscpfe
                         break;
                     case KeyboardHandlerCommand.Del:
                         buff.Del();
+                        break;
+                    case KeyboardHandlerCommand.CtrlZ:
+                        if (operations.Curr != null)
+                        {
+                            buff.PerformOperation(operations.Curr.Value.Undo());
+                            operations.Prev();
+                        }
+                        break;
+                    case KeyboardHandlerCommand.CtrlY:
+                        //buff.Redo(currOperation);
                         break;
                     default:
                         throw new SSCPFEHandlerException();
