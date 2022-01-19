@@ -47,6 +47,9 @@ namespace sscpfe
         // load from list
         public void LoadBuff(List<string> buff)
         {
+            // replace all tabs with "    " (4 spaces)
+            for (int i = 0; i < buff.Count; i++)
+                buff[i] = buff[i].Replace("\t", new string(' ', 4));
             this.buff = buff;
         }
 

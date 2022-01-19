@@ -87,10 +87,10 @@ namespace sscpfe
                 {
                     using (FileStream stream = new FileStream(fname, FileMode.Open)) // try to open it
                     {
-                        List<string> b = new List<string>();        // tmp buffer
-                        StreamReader sR = new StreamReader(stream, encoding); // open stream reader
-                        string[] arr = sR.ReadToEnd().Split('\n');  // read everything and split by line
-                        for (int i = 0; i < arr.Length; i++)         // add every line in b
+                        List<string> b = new List<string>();                            // tmp buffer
+                        StreamReader sR = new StreamReader(stream, encoding);           // open stream reader
+                        string[] arr = sR.ReadToEnd().Replace("\r", "").Split('\n');    // read everything and split by line
+                        for (int i = 0; i < arr.Length; i++)                            // add every line in b
                             b.Add(arr[i]);
                         sR.Close();                                 // close stream
                                                                     //Console.WriteLine("Open");                // debug info (actually bad idea)
