@@ -6,6 +6,7 @@
         HELP,
         FILE,
         ENCODING,
-        BINARY
+        BINARY,
+        CFG
     }
 }

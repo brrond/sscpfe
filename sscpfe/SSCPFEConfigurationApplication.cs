@@ -6,12 +6,39 @@ using System.Diagnostics;
 
 namespace sscpfe
 {
-    class SSCPFEConfigurationApplication
+    class SSCPFEConfigurationApplication : IApp
     {
-        public static int GetTabSize()
+
+        public SSCPFEConfigurationApplication()
         {
-            return int.Parse(ConfigurationManager.AppSettings["TabSize"]);
+
         }
 
+        public static int GetTabSize()
+        {
+            Configuration cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            return int.Parse(cfg.AppSettings.Settings["TabSize"].Value);
+        }
+
+        public void Mainloop()
+        {
+            // ask user and set value for every possible cfg
+            // Possible settings: 
+            // TabSize
+
+            Configuration cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            int tabSize = int.Parse(cfg.AppSettings.Settings["TabSize"].Value);
+            string inp = "";
+            do {
+                Console.Write("TabSize : ");
+                System.Windows.Forms.SendKeys.SendWait(tabSize.ToString());
+                inp = Console.ReadLine();
+                if (int.TryParse(inp, out tabSize) && tabSize > 0)
+                    break;
+
+            } while (true);
+            cfg.AppSettings.Settings["TabSize"].Value = tabSize.ToString();
+            cfg.Save();
+        }
     }
 }

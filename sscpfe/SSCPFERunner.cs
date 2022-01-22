@@ -33,6 +33,9 @@ namespace sscpfe
                 case ARGSHandlerCommand.BINARY:
                     app = new SSCPFEBinaryReaderApplication(args[1]);
                     break;
+                case ARGSHandlerCommand.CFG:
+                    app = new SSCPFEConfigurationApplication();
+                    break;
                 default:
                     break;
             }
@@ -64,6 +67,7 @@ namespace sscpfe
             //sscpfe /b file_name               // DONE
             //sscpfe /e encoding file_name      // DONE
             //sscpfe jkfajfkejfeifjeiffjeifj    // DONE
+            //sscpfe /cfg
             if (args.Length != 0)
             {
                 if((args[0].ToLower() == "/b" || args[0].ToLower() == "-b") && args.Length == 2)
@@ -74,7 +78,10 @@ namespace sscpfe
                 {
                     return ARGSHandlerCommand.ENCODING;
                 }
-
+                else if((args[0].ToLower() == "/cfg"))
+                {
+                    return ARGSHandlerCommand.CFG;
+                }
                 
                 if (args[0].ToLower()[0] == '/')
                     return ARGSHandlerCommand.HELP;
