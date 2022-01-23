@@ -18,6 +18,8 @@
         Del,
         CtrlLeftArrow,
         CtrlRightArrow,
+        CtrlZ,
+        CtrlY,
         Default
     }
 }
