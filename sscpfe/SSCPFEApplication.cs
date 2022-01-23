@@ -3,141 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Reflection;
 
 namespace sscpfe
 {
-
-    class OperationInfo
-    {
-        public int XPos { get; private set; }
-        public int YPos { get; private set; }
-        public int Repeats { get; private set; }
-        public MethodInfo Method { get; private set; }
-        public object[] Parametrs { get; private set; }
-
-        public OperationInfo(int xPos, int yPos, int repeats, MethodInfo method, object[] parametrs)
-        {
-            XPos = xPos;
-            YPos = yPos;
-            Repeats = repeats;
-            Method = method;
-            Parametrs = parametrs;
-        }
-    }
-
-    abstract class Operation
-    {
-        protected int xPosBefore, yPosBefore;
-        protected int xPosAfter, yPosAfter;
-
-        public Operation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter)
-        {
-            xPosBefore = XPosBefore;
-            yPosBefore = YPosBefore;
-            xPosAfter = XPosAfter;
-            yPosAfter = YPosAfter;
-        }
-
-        abstract public OperationInfo Undo();
-
-        //abstract public void Redo();
-    }
-
-    class DeleteOperation : Operation
-    {
-        char ch = '\0';
-        string str = "";
-        public DeleteOperation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter, char Ch) :
-            base(XPosBefore, YPosBefore, XPosAfter, YPosAfter)
-        {
-            ch = Ch;
-        }
-
-        public DeleteOperation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter, string Str) :
-            base(XPosBefore, YPosBefore, XPosAfter, YPosAfter)
-        {
-            str = Str;
-        }
-
-        public override OperationInfo Undo()
-        {
-            Type buffType = typeof(Buffer);
-            if(ch == '\0')
-            {
-                MethodInfo methodInfo = buffType.GetMethod("Insert");
-                return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
-                    new object[] { str });
-            }
-            else if (ch == '\n')
-            {
-                MethodInfo methodInfo = buffType.GetMethod("Enter");
-                return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
-                    new object[] { });
-            }
-            else
-            {
-                MethodInfo methodInfo = buffType.GetMethod("Insert");
-                return new OperationInfo(xPosAfter, yPosAfter, 1, methodInfo,
-                    new object[] { ch.ToString() });
-            }
-        }
-    }
-
-    class InsertOperation : Operation
-    {
-        int len = 1;
-        public InsertOperation(int XPosBefore, int YPosBefore, int XPosAfter, int YPosAfter, int Repeats = 1) : base(XPosBefore, YPosBefore, XPosAfter, YPosAfter)
-        {
-            if(Repeats > 0)
-                len = Repeats;
-        }
-
-        public override OperationInfo Undo()
-        {
-            Type buffType = typeof(Buffer);
-            MethodInfo methodInfo = buffType.GetMethod("Backspace");
-            return new OperationInfo(xPosAfter, yPosAfter, len, methodInfo,
-                new object[] { });
-        }
-    }
-
-    class OperationList
-    {
-        LinkedList<Operation> operations;
-        public LinkedListNode<Operation> Curr { get; private set; } = null;
-        public OperationList()
-        {
-            operations = new LinkedList<Operation>();
-        }
-        public void Prev()
-        {
-            if(Curr != null)
-                Curr = Curr.Previous;
-        }
-
-        public void Next()
-        {
-            if(Curr != null)
-                Curr = Curr.Next;
-        }
-        public void Add(Operation operation)
-        {
-           if(Curr != null && Curr != operations.Last) // for redo
-            {
-                // delete after curr
-                while (Curr.Next != null)
-                {
-                    operations.Remove(Curr.Next);
-                }
-
-                if (operations.Count == 0)
-                    Curr = null;
-            }
-            operations.AddLast(operation);
-            Curr = operations.Last;
-        }
-    }
 
     class SSCPFEApplication : IApp
     {
@@ -357,11 +225,11 @@ namespace sscpfe
                             currChar = buff[yPosBefore][xPosBefore - 1];            // save current char (else curr char '\n')
                         buff.Backspace();                                           // perform backspace
                         operations.Add(new DeleteOperation(xPosBefore, yPosBefore,  // add new operation
-                            buff.XPos, buff.YPos, currChar));
+                            buff.XPos, buff.YPos, currChar, false));
                         break;
                     case KeyboardHandlerCommand.Enter:
                         buff.Enter();                                               // perform enter
-                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos)); // add new insert operation
+                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, "\n")); // add new insert operation
                         break;
                     case KeyboardHandlerCommand.Esc:
                         HandleEsc();
@@ -374,7 +242,7 @@ namespace sscpfe
                         break;
                     case KeyboardHandlerCommand.Default:
                         buff.Insert("" + kh.LastKeyChar);                           // perform insertion
-                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos)); // add new operation
+                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, "" + kh.LastKeyChar)); // add new operation
                         break;
                     case KeyboardHandlerCommand.CtrlV:
                         // TODO: Fix ctrl v (problems with enter)
@@ -386,7 +254,7 @@ namespace sscpfe
                                 buff.Enter();
                             }
                             operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos,
-                                tmp.Length));
+                                tmp));
                         }
                         break;
                     case KeyboardHandlerCommand.CtrlBackspace:
@@ -403,11 +271,11 @@ namespace sscpfe
                             currStr = buff[yPosBefore].Substring(currPos, xPosBefore - currPos);
                         }
                         buff.CtrlBackspace();
-                        operations.Add(new DeleteOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, currStr));
+                        operations.Add(new DeleteOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, currStr, false));
                         break;
                     case KeyboardHandlerCommand.Tab:
                         buff.Insert("    ");
-                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, 4));
+                        operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, "    "));
                         break;
                     case KeyboardHandlerCommand.CtrlLeftArrow:
                         buff.CtrlLeftArrow();
@@ -429,14 +297,14 @@ namespace sscpfe
                             currStr = buff[yPosBefore].Substring(xPosBefore, currPos - xPosBefore);
                         }
                         buff.CtrlDel();
-                        operations.Add(new DeleteOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, currStr));
+                        operations.Add(new DeleteOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, currStr, true));
                         break;
                     case KeyboardHandlerCommand.Del:
                         if (xPosBefore != buff[yPosBefore].Length)                  // if it isn't end of the line
                             currChar = buff[yPosBefore][xPosBefore];                // save curr char (else curr char '\n')
                         buff.Del();                                                 // perform del
                         operations.Add(new DeleteOperation(xPosBefore, yPosBefore,  // add new operation
-                            buff.XPos, buff.YPos, currChar));
+                            buff.XPos, buff.YPos, currChar, true));
                         break;
                     case KeyboardHandlerCommand.CtrlZ:
                         if (operations.Curr != null)                                // if we have operations
@@ -446,7 +314,11 @@ namespace sscpfe
                         }
                         break;
                     case KeyboardHandlerCommand.CtrlY:
-                        //buff.Redo(currOperation);
+                        if(operations.Curr != null && operations.Curr.Next != null)
+                        {
+                            buff.PerformOperation(operations.Curr.Next.Value.Redo());
+                            operations.Next();
+                        }
                         break;
                     default:
                         throw new SSCPFEHandlerException();

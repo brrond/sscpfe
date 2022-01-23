@@ -54,6 +54,11 @@ namespace sscpfe
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // has ctrl flag
                         return KeyboardHandlerCommand.CtrlZ;                // ctrl + Z
                     goto default;
+                case "Y":
+                case "y":
+                    if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // has ctrl flag
+                        return KeyboardHandlerCommand.CtrlY;                // ctrl + y
+                    goto default;
                 default:
                     LastKey = info.Key;                                     // insert
                     LastKeyChar = info.KeyChar;                             // this char
