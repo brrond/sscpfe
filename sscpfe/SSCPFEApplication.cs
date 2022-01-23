@@ -251,7 +251,7 @@ namespace sscpfe
                         // TODO: Fix ctrl v (problems with enter)
                         if (System.Windows.Forms.Clipboard.ContainsText())
                         {
-                            tmp = System.Windows.Forms.Clipboard.GetText().Replace("\r", "").Replace("\t", "    ");
+                            tmp = System.Windows.Forms.Clipboard.GetText().Replace("\r", "").Replace("\t", tab);
                             foreach (string el in tmp.Split('\n')) {
                                 buff.Insert(el);
                                 buff.Enter();

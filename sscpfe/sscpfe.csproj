@@ -54,12 +54,14 @@
     <Compile Include="Buffer.cs" />
     <Compile Include="DeleteOperation.cs" />
     <Compile Include="IApp.cs" />
+    <Compile Include="InsertOperation.cs" />
     <Compile Include="KeyboardHandlerCommand.cs" />
     <Compile Include="KeyboardHandler.cs" />
     <Compile Include="MainClass.cs" />
     <Compile Include="ARGSHandlerCommand.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="OperationInfo.cs" />
+    <Compile Include="OperationList.cs" />
     <Compile Include="SSCPFEApplication.cs" />
     <Compile Include="SSCPFEBinaryReaderApplication.cs" />
     <Compile Include="SSCPFEConfigurationApplication.cs" />
