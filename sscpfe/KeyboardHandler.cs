@@ -16,7 +16,7 @@ namespace sscpfe
         // return some of HandlerCommand enum element
         public KeyboardHandlerCommand Handle()
         {
-            ConsoleKeyInfo info = Console.ReadKey();                        // get user key
+            ConsoleKeyInfo info = Console.ReadKey(true);                        // get user key
             switch(info.Key.ToString())                                     // if it's
             {
                 case "UpArrow": return KeyboardHandlerCommand.UpArrow;      // move up
@@ -46,6 +46,8 @@ namespace sscpfe
                 case "v":                                                   // 
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // has ctrl flag
                         return KeyboardHandlerCommand.CtrlV;                // ctrl + V
+                                                                            // TODO: actually it is shift ctrl v
+                                                                            // doesn't work
                     goto default;
                 case "Z":
                 case "z":

@@ -152,7 +152,7 @@ namespace sscpfe
             // delete some inappropriate symbol
             else if (buff[YPos].Length == 0)
             {
-                buff[YPos] = CreateEmptyLine(1);
+                //***buff[YPos] = CreateEmptyLine(1);
             }
         }
 
@@ -206,7 +206,7 @@ namespace sscpfe
             // delete some inappropriate symbol
             else if (buff[YPos].Length == 0)
             {
-                buff[YPos] = CreateEmptyLine(1);
+                //***buff[YPos] = CreateEmptyLine(1);
             }
         }
 
