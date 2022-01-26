@@ -46,8 +46,6 @@ namespace sscpfe
                 case "v":                                                   // 
                     if (info.Modifiers.HasFlag(ConsoleModifiers.Control))   // has ctrl flag
                         return KeyboardHandlerCommand.CtrlV;                // ctrl + V
-                                                                            // TODO: actually it is shift ctrl v
-                                                                            // doesn't work
                     goto default;
                 case "Z":
                 case "z":

@@ -9,6 +9,7 @@ namespace sscpfe
     {
         List<string> buff;          // list of strings
         bool newLineFlag = false;   // new line problem
+        int newLineCounter = 0;
 
         public Buffer()
         {
@@ -79,17 +80,36 @@ namespace sscpfe
                 Console.WriteLine(buff[i]);
                 buff[i] = buff[i].Split('\0')[0];
             }
-            if (newLineFlag)
+            //if (newLineFlag)
+            while(newLineCounter != 0)
             {
-                newLineFlag = false;
+                //newLineFlag = false;
                 buff.RemoveAt(buff.Count - 1);
+                newLineCounter--;
             }
             Console.SetCursorPosition(DefaultXPos + XPos, DefaultYPos + YPos);
+        }
+
+
+        void MultilineInsert(string str)
+        {
+            string[] split = str.Split('\n');
+            for (int i = 0; i < split.Length - 1; i++)
+            {
+                Insert(split[i]);
+                Enter();
+            }
+            Insert(split[split.Length - 1]);
         }
 
         // insert command (str is actually char)
         public void Insert(string str)
         {
+            if (str.Contains("\n"))
+            {
+                MultilineInsert(str);
+                return;
+            }
             buff[YPos] = buff[YPos].Insert(XPos++, str);    // insert at XPos
             XPos += str.Length - 1;                         // add len of str to XPos
         }
@@ -216,9 +236,14 @@ namespace sscpfe
 
         void ClearConsole()
         {
+            // TODO: Fix magical 1000
+            // This works with one line
             // I DONT KNOW WHAT THE HECK
-            buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
-            newLineFlag = true;             // ok
+            //buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
+            //newLineFlag = true;             // ok
+            // BUT what if we have multiple new lines
+            buff.Add(CreateEmptyLine(1000));
+            newLineCounter++;
             int tmp = YPos + 1;             // some tmp var
             while (tmp != buff.Count - 1)   // while not last line
             {

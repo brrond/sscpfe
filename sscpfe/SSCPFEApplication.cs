@@ -248,14 +248,10 @@ namespace sscpfe
                         operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos, "" + kh.LastKeyChar)); // add new operation
                         break;
                     case KeyboardHandlerCommand.CtrlV:
-                        // TODO: Fix ctrl v (problems with enter)
                         if (System.Windows.Forms.Clipboard.ContainsText())
                         {
                             tmp = System.Windows.Forms.Clipboard.GetText().Replace("\r", "").Replace("\t", tab);
-                            foreach (string el in tmp.Split('\n')) {
-                                buff.Insert(el);
-                                buff.Enter();
-                            }
+                            buff.Insert(tmp);
                             operations.Add(new InsertOperation(xPosBefore, yPosBefore, buff.XPos, buff.YPos,
                                 tmp));
                         }
