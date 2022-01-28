@@ -4,34 +4,32 @@ using System.Reflection;
 
 namespace sscpfe
 {
-
     class Buffer
     {
         List<string> buff;          // list of strings
-        bool newLineFlag = false;   // new line problem
         int newLineCounter = 0;
 
         public Buffer()
         {
-            buff = new List<string>();  // empty list of strings
-            buff.Add("");               // not empty actually
-            XPos = 0;
-            YPos = 0;
+            buff = new List<string>
+            {
+                ""               // not empty actually
+            };  // empty list of strings
+            cursor.XPos = 0;
+            cursor.YPos = 0;
         }
 
         public Buffer(int DefaultX, int DefaultY) : this()
         {
-            DefaultXPos = DefaultX;
-            DefaultYPos = DefaultY;
+            defaultCursor.XPos = DefaultX;
+            defaultCursor.YPos = DefaultY;
         }
 
         // positions of cursor
-        public int XPos { get; private set; }
-        public int YPos { get; private set; }
+        public CursorPosition cursor;
 
-        // save for reset (I think)
-        public int DefaultXPos { get; private set; }
-        public int DefaultYPos { get; private set; }
+        // save for reset
+        public CursorPosition defaultCursor;
 
         // get string by i
         public string this[int i]
@@ -74,7 +72,7 @@ namespace sscpfe
         // print buffer
         public void Print()
         {
-            Console.SetCursorPosition(DefaultXPos, DefaultYPos);
+            Console.SetCursorPosition(defaultCursor.XPos, defaultCursor.YPos);
             for(int i = 0; i < buff.Count; i++)
             {
                 Console.WriteLine(buff[i]);
@@ -87,7 +85,7 @@ namespace sscpfe
                 buff.RemoveAt(buff.Count - 1);
                 newLineCounter--;
             }
-            Console.SetCursorPosition(DefaultXPos + XPos, DefaultYPos + YPos);
+            Console.SetCursorPosition(defaultCursor.XPos + cursor.XPos, defaultCursor.YPos + cursor.YPos);
         }
 
 
@@ -110,25 +108,25 @@ namespace sscpfe
                 MultilineInsert(str);
                 return;
             }
-            buff[YPos] = buff[YPos].Insert(XPos++, str);    // insert at XPos
-            XPos += str.Length - 1;                         // add len of str to XPos
+            buff[cursor.YPos] = buff[cursor.YPos].Insert(cursor.XPos++, str);    // insert at XPos
+            cursor.XPos += str.Length - 1;                         // add len of str to XPos
         }
 
         ///////////
         public void Backspace()
         {
-            if (XPos != 0)
+            if (cursor.XPos != 0)
             {
-                buff[YPos] = buff[YPos].Remove(--XPos, 1);  // just remove
-                buff[YPos] += (char)0;                      // and add end of line on new end
+                buff[cursor.YPos] = buff[cursor.YPos].Remove(--cursor.XPos, 1);  // just remove
+                buff[cursor.YPos] += (char)0;                      // and add end of line on new end
             }
-            else if(YPos != 0)
+            else if(cursor.YPos != 0)
             {
                 // delete \n
-                XPos = buff[YPos - 1].Length;   // set new XPos 
-                buff[YPos - 1] += buff[YPos];   // add this line to prev
-                buff.RemoveAt(YPos);            // remove line
-                YPos--;                         // set new YPos
+                cursor.XPos = buff[cursor.YPos - 1].Length;   // set new XPos 
+                buff[cursor.YPos - 1] += buff[cursor.YPos];   // add this line to prev
+                buff.RemoveAt(cursor.YPos);            // remove line
+                cursor.YPos--;                         // set new YPos
 
                 ClearConsole();
             }
@@ -138,31 +136,31 @@ namespace sscpfe
         public void CtrlBackspace()
         {
             // if there are words (or blanks)
-            if (XPos != 0) 
+            if (cursor.XPos != 0) 
             {
                 // all possible variants:
                 // "some text " => "some "
                 // "some text" => "some "
-                int startOfThePrevWord = XPos - 1;
-                while (startOfThePrevWord != 0 && buff[YPos][startOfThePrevWord] == ' ')
+                int startOfThePrevWord = cursor.XPos - 1;
+                while (startOfThePrevWord != 0 && buff[cursor.YPos][startOfThePrevWord] == ' ')
                         startOfThePrevWord--;
 
                 int deleteFromHere = 0;
-                int howManyToDelete = XPos;
+                int howManyToDelete = cursor.XPos;
                 int newStart = 0;
 
                 // either we reached the begining of the line
                 if(startOfThePrevWord != 0)
                 {
                     // find the begining of this word
-                    while (startOfThePrevWord != 0 && buff[YPos][startOfThePrevWord] != ' ')
+                    while (startOfThePrevWord != 0 && buff[cursor.YPos][startOfThePrevWord] != ' ')
                         startOfThePrevWord--;
 
                     // either it's begining of the word
                     if (startOfThePrevWord != 0)
                     {
                         startOfThePrevWord++;
-                        int dif = XPos - startOfThePrevWord;
+                        int dif = cursor.XPos - startOfThePrevWord;
                         deleteFromHere = startOfThePrevWord;
                         howManyToDelete = dif;
                         newStart = startOfThePrevWord;
@@ -170,11 +168,11 @@ namespace sscpfe
                 }
                 // or we in prev word
                 // or it's end (begining) of the line
-                buff[YPos] = buff[YPos].Remove(deleteFromHere, howManyToDelete) + CreateEmptyLine(howManyToDelete + 1);
-                XPos = newStart;
+                buff[cursor.YPos] = buff[cursor.YPos].Remove(deleteFromHere, howManyToDelete) + CreateEmptyLine(howManyToDelete + 1);
+                cursor.XPos = newStart;
             }
             // delete some inappropriate symbol
-            else if (buff[YPos].Length == 0)
+            else if (buff[cursor.YPos].Length == 0)
             {
                 //***buff[YPos] = CreateEmptyLine(1);
             }
@@ -182,16 +180,16 @@ namespace sscpfe
 
         public void Del()
         {
-            if (XPos != buff[YPos].Length)
+            if (cursor.XPos != buff[cursor.YPos].Length)
             {
-                buff[YPos] = buff[YPos].Remove(XPos, 1);    // just remove
-                buff[YPos] += (char)0;                      // and add end of line on new end
+                buff[cursor.YPos] = buff[cursor.YPos].Remove(cursor.XPos, 1);    // just remove
+                buff[cursor.YPos] += (char)0;                      // and add end of line on new end
             }
-            else if (YPos != buff.Count - 1)
+            else if (cursor.YPos != buff.Count - 1)
             {
                 // delete \n
-                buff[YPos] += buff[YPos + 1];   // add next line to this
-                buff.RemoveAt(YPos + 1);        // remove next line
+                buff[cursor.YPos] += buff[cursor.YPos + 1];   // add next line to this
+                buff.RemoveAt(cursor.YPos + 1);        // remove next line
 
                 ClearConsole();
             }
@@ -200,35 +198,35 @@ namespace sscpfe
         public void CtrlDel()
         {
             // if there are words (or blanks)
-            if (XPos != buff[YPos].Length)
+            if (cursor.XPos != buff[cursor.YPos].Length)
             {
-                int endOfTheNextWord = XPos + 1;
-                while (endOfTheNextWord != buff[YPos].Length && buff[YPos][endOfTheNextWord] == ' ')
+                int endOfTheNextWord = cursor.XPos + 1;
+                while (endOfTheNextWord != buff[cursor.YPos].Length && buff[cursor.YPos][endOfTheNextWord] == ' ')
                     endOfTheNextWord++;
 
-                int howManyToDelete = buff[YPos].Length - XPos;
+                int howManyToDelete = buff[cursor.YPos].Length - cursor.XPos;
 
                 // either we reached the end of the line
-                if (endOfTheNextWord != buff[YPos].Length)
+                if (endOfTheNextWord != buff[cursor.YPos].Length)
                 {
                     // find the end of this word
-                    while (endOfTheNextWord != buff[YPos].Length && buff[YPos][endOfTheNextWord] != ' ')
+                    while (endOfTheNextWord != buff[cursor.YPos].Length && buff[cursor.YPos][endOfTheNextWord] != ' ')
                         endOfTheNextWord++;
 
                     // either it's end of the word
-                    if (endOfTheNextWord != buff[YPos].Length)
+                    if (endOfTheNextWord != buff[cursor.YPos].Length)
                     {
                         //endOfTheNextWord++;
-                        int dif = endOfTheNextWord - XPos + 1;
+                        int dif = endOfTheNextWord - cursor.XPos + 1;
                         howManyToDelete = dif;
                     }
                 }
                 // or we in prev word
                 // or it's end (begining) of the line
-                buff[YPos] = buff[YPos].Remove(XPos, howManyToDelete) + CreateEmptyLine(howManyToDelete + 1);
+                buff[cursor.YPos] = buff[cursor.YPos].Remove(cursor.XPos, howManyToDelete) + CreateEmptyLine(howManyToDelete + 1);
             }
             // delete some inappropriate symbol
-            else if (buff[YPos].Length == 0)
+            else if (buff[cursor.YPos].Length == 0)
             {
                 //***buff[YPos] = CreateEmptyLine(1);
             }
@@ -244,7 +242,7 @@ namespace sscpfe
             // BUT what if we have multiple new lines
             buff.Add(CreateEmptyLine(1000));
             newLineCounter++;
-            int tmp = YPos + 1;             // some tmp var
+            int tmp = cursor.YPos + 1;             // some tmp var
             while (tmp != buff.Count - 1)   // while not last line
             {
                 buff[tmp] += CreateEmptyLine(1000); // set empty line
@@ -255,16 +253,16 @@ namespace sscpfe
         public void Enter()
         {
             string additionalEmptyString = "";
-            if (YPos + 1 < buff.Count) // if it's last line
+            if (cursor.YPos + 1 < buff.Count) // if it's last line
             {
-                additionalEmptyString = CreateEmptyLine(buff[YPos + 1].Length); // create new empty line next
+                additionalEmptyString = CreateEmptyLine(buff[cursor.YPos + 1].Length); // create new empty line next
             }
 
             // it's not last line
-            buff.Insert(YPos + 1, buff[YPos].Substring(XPos) + additionalEmptyString); // split lines
-            buff[YPos] = buff[YPos].Substring(0, XPos) + CreateEmptyLine(buff[YPos + 1].Length); // delete garbage
-            YPos++; // new line
-            XPos = 0; // new position
+            buff.Insert(cursor.YPos + 1, buff[cursor.YPos].Substring(cursor.XPos) + additionalEmptyString); // split lines
+            buff[cursor.YPos] = buff[cursor.YPos].Substring(0, cursor.XPos) + CreateEmptyLine(buff[cursor.YPos + 1].Length); // delete garbage
+            cursor.YPos++; // new line
+            cursor.XPos = 0; // new position
 
             // there is still one problem.
             // If we splited string (or just added one)
@@ -277,90 +275,90 @@ namespace sscpfe
         // Just change XPos and YPos with conditions
         public void MoveUp()
         {
-            if (YPos != 0)
+            if (cursor.YPos != 0)
             {
-                YPos--;
-                if (XPos > buff[YPos].Length)
-                    XPos = buff[YPos].Length;
+                cursor.YPos--;
+                if (cursor.XPos > buff[cursor.YPos].Length)
+                    cursor.XPos = buff[cursor.YPos].Length;
             }
         }
 
         public void MoveDown()
         {
-            if (YPos < buff.Count - 1)
+            if (cursor.YPos < buff.Count - 1)
             {
-                YPos++;
-                if (XPos > buff[YPos].Length)
-                    XPos = buff[YPos].Length;
+                cursor.YPos++;
+                if (cursor.XPos > buff[cursor.YPos].Length)
+                    cursor.XPos = buff[cursor.YPos].Length;
             }
         }
 
         public void MoveLeft()
         {
-            if (XPos != 0)
+            if (cursor.XPos != 0)
             {
-                XPos--;
+                cursor.XPos--;
             }
-            else if(YPos != 0)
+            else if(cursor.YPos != 0)
             {
-                XPos = buff[--YPos].Length;
+                cursor.XPos = buff[--cursor.YPos].Length;
             }
         }
 
         public void MoveRight()
         {
-            if (XPos < buff[YPos].Length)
+            if (cursor.XPos < buff[cursor.YPos].Length)
             {
-                XPos++;
+                cursor.XPos++;
             }
-            else if(YPos < buff.Count - 1) // if there are some more lines
+            else if(cursor.YPos < buff.Count - 1) // if there are some more lines
             {
-                YPos++;
-                XPos = 0;
+                cursor.YPos++;
+                cursor.XPos = 0;
             }
         }
 
         public void Home()
         {
-            XPos = 0;
+            cursor.XPos = 0;
         }
 
         public void End()
         {
-            XPos = buff[YPos].Length;
+            cursor.XPos = buff[cursor.YPos].Length;
         }
 
         public void CtrlLeftArrow()
         {
             // place cursor before last word
-            int newCursorPosition = XPos - 1;
-            while(newCursorPosition > 0 && buff[YPos][newCursorPosition] == ' ')
+            int newCursorPosition = cursor.XPos - 1;
+            while(newCursorPosition > 0 && buff[cursor.YPos][newCursorPosition] == ' ')
                 newCursorPosition--;
-            while (newCursorPosition > 0 && buff[YPos][newCursorPosition] != ' ')
+            while (newCursorPosition > 0 && buff[cursor.YPos][newCursorPosition] != ' ')
                 newCursorPosition--;
 
             if (newCursorPosition == 0)
-                XPos = 0;
+                cursor.XPos = 0;
             else
-                XPos = newCursorPosition + 1;
+                cursor.XPos = newCursorPosition + 1;
         }
 
         public void CtrlRightArrow()
         {
             // place cursor after next word
-            int newCursorPosition = XPos;
-            while (newCursorPosition < buff[YPos].Length && buff[YPos][newCursorPosition] == ' ')
+            int newCursorPosition = cursor.XPos;
+            while (newCursorPosition < buff[cursor.YPos].Length && buff[cursor.YPos][newCursorPosition] == ' ')
                 newCursorPosition++;
-            while (newCursorPosition < buff[YPos].Length && buff[YPos][newCursorPosition] != ' ')
+            while (newCursorPosition < buff[cursor.YPos].Length && buff[cursor.YPos][newCursorPosition] != ' ')
                 newCursorPosition++;
-            XPos = newCursorPosition;
+            cursor.XPos = newCursorPosition;
         }
 
         public void PerformOperation(OperationInfo oi)
         {
             int r = oi.Repeats;
-            XPos = oi.XPos;
-            YPos = oi.YPos;
+            cursor.XPos = oi.XPos;
+            cursor.YPos = oi.YPos;
             while(r > 0)
             {
                 oi.Method.Invoke(this, oi.Parametrs);

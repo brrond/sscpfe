@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffer.cs" />
+    <Compile Include="CursorPosition.cs" />
     <Compile Include="DeleteOperation.cs" />
     <Compile Include="IApp.cs" />
     <Compile Include="InsertOperation.cs" />
