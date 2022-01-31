@@ -12,7 +12,6 @@ namespace sscpfe
             this.args = args;
         }
 
-
         public void Run()
         {
             IApp app = null; // create app
@@ -36,11 +35,14 @@ namespace sscpfe
                 case ARGSHandlerCommand.CFG:
                     app = new SSCPFEConfigurationApplication();
                     break;
+                case ARGSHandlerCommand.MONKEYTYPE:
+                    app = new SSCPFETypingTestApplication();
+                    break;
                 default:
                     break;
             }
-            
-            if(app != null)
+
+            if (app != null)
                 app.Mainloop(); // start app
         }
 
@@ -67,7 +69,8 @@ namespace sscpfe
             //sscpfe /b file_name               // DONE
             //sscpfe /e encoding file_name      // DONE
             //sscpfe jkfajfkejfeifjeiffjeifj    // DONE
-            //sscpfe /cfg
+            //sscpfe /cfg                       // DONE
+            //sscpfe /typingtest                //
             if (args.Length != 0)
             {
                 if((args[0].ToLower() == "/b" || args[0].ToLower() == "-b") && args.Length == 2)
@@ -82,7 +85,10 @@ namespace sscpfe
                 {
                     return ARGSHandlerCommand.CFG;
                 }
-                
+                else if((args[0].ToLower() == "/typingtest"))
+                {
+                    return ARGSHandlerCommand.MONKEYTYPE;
+                }
                 if (args[0].ToLower()[0] == '/')
                     return ARGSHandlerCommand.HELP;
                 return ARGSHandlerCommand.FILE;

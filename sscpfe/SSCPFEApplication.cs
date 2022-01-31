@@ -7,53 +7,17 @@ using System.Text.RegularExpressions;
 namespace sscpfe
 {
 
-    class SSCPFEApplication : IApp
+    class SSCPFEApplication : SSCPFEApplicationAbstract
     {
-        // Prev console config
-        readonly int YPos;
-        readonly string title;
-        readonly int bufferWidth;
-        readonly int bufferHeight;
-        private readonly ConsoleColor cF;
-        private readonly ConsoleColor cB;
-        readonly Encoding inputEncoding;
-        readonly Encoding outputEncoding;
-
-        // New console config
-        readonly Encoding encoding = Encoding.UTF8;
-
-        // 
-        readonly Buffer buff;
-        readonly KeyboardHandler kh;
         readonly OperationList operations;
 
         // curr file name
         public string FName { get; private set; }
 
         // default constructor
-        public SSCPFEApplication()
+        public SSCPFEApplication() : base()
         {
-            // save cfg
-            bufferWidth = Console.BufferWidth;
-            bufferHeight = Console.BufferHeight;
-            cF = Console.ForegroundColor;
-            cB = Console.BackgroundColor;
-            YPos = Console.CursorTop;
-            inputEncoding = Console.InputEncoding;
-            outputEncoding = Console.OutputEncoding;
-            title = Console.Title;
-
-            // when application is closed return prev console config
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
-            {
-                Console.ForegroundColor = cF;
-                Console.BackgroundColor = cB;
-                Console.SetBufferSize(bufferWidth, bufferHeight);
-                Console.SetCursorPosition(0, YPos + buff.MaxYPos() + 5);
-                Console.OutputEncoding = outputEncoding;
-                Console.InputEncoding = inputEncoding;
-                Console.Title = title;
-            };
+            buff = new Buffer(0, YPos); // init Buffer
 
             // set new config
             Console.SetBufferSize(16000, 16000); // I don't know why value so "high"
@@ -62,8 +26,6 @@ namespace sscpfe
             Console.InputEncoding = Encoding.UTF8;
             Console.Title = "sscpfe";
 
-            kh = new KeyboardHandler(); // init KeyboardHandler
-            buff = new Buffer(0, YPos); // init Buffer
             operations = new OperationList();
             FName = ""; // there is no file (means new file will be created)
         }
@@ -75,7 +37,7 @@ namespace sscpfe
 
         public SSCPFEApplication(string fname, Encoding encoding) : this()
         {
-            this.encoding = encoding;
+            base.encoding = encoding;
             Console.OutputEncoding = encoding;
             Console.InputEncoding = encoding;
             FName = fname; // we have some file to work with
@@ -131,33 +93,6 @@ namespace sscpfe
             return false;
         }
 
-        bool AskUser(string msg)
-        {
-            bool res;
-            do
-            {
-                Console.Write(msg);
-                string key = Console.ReadKey().Key.ToString().ToLower().Trim();
-                if (key == "y")
-                {
-                    res = true;
-                    break;
-                }
-                else if (key == "n")
-                {
-                    res = false;
-                    break;
-                }
-
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write(new string(' ', msg.Length + 1));
-                Console.SetCursorPosition(0, Console.CursorTop);
-
-            } while (true);
-            Console.WriteLine();
-            return res;
-        }
-
         void HandleEsc()
         {
             // user pressed ESC
@@ -190,7 +125,7 @@ namespace sscpfe
             }
         }
 
-        public void Mainloop()
+        public override void Mainloop()
         {
             while (true)
             {

@@ -7,6 +7,7 @@
         FILE,
         ENCODING,
         BINARY,
-        CFG
+        CFG,
+        MONKEYTYPE
     }
 }
