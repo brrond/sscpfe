@@ -18,9 +18,6 @@ namespace sscpfe
         public SSCPFEApplication() : base()
         {
             buff = new Buffer(0, YPos); // init Buffer
-
-            SetDeaultConsoleCfg();
-
             operations = new OperationList();
             FName = ""; // there is no file (means new file will be created)
         }

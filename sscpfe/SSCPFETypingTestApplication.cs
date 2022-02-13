@@ -13,8 +13,6 @@ namespace sscpfe
         string text;
         public SSCPFETypingTestApplication() : base()
         {
-            SetDeaultConsoleCfg();
-
             // TODO: A lot of text
             string html = new WebClient().DownloadString("https://randomtextgenerator.com/");
             string split = html.Split(new string[] { "<div id=\"randomtext_box\">" }, StringSplitOptions.None)[1].Trim();
