@@ -5,9 +5,14 @@ namespace sscpfe
 {
     class TypingTestBuffer : IBuffer
     {
+        // Fields
         Buffer buff;
         List<List<CharColor>> colorsBuff;
+        List<List<int>> entries; // 0 - not found
+                                 // 1 - true
+                                 // -1 - false
 
+        public List<List<int>> Entries => entries;
         public List<List<CharColor>> ColorsBuff => colorsBuff;
 
         List<string> text;
@@ -27,22 +32,33 @@ namespace sscpfe
             LoadBuff(text);
         }
 
-        public TypingTestBuffer(string Text)
+        void init(string Text)
         {
             colorsBuff = new List<List<CharColor>>();
-            buff = new Buffer();
             LoadText(Text);
             _defaultCursor = ((IBuffer)buff).defaultCursor;
+            entries = new List<List<int>>();
+            for (int i = 0; i < text.Count; i++)
+            {
+                entries.Add(new List<int>());
+                for (int j = 0; j < text[i].Length; j++) entries[i].Add(0);
+            }
+        }
+
+        // Constructors
+        public TypingTestBuffer(string Text)
+        {
+            buff = new Buffer();
+            init(Text);
         }
 
         public TypingTestBuffer(int DefaultX, int DefaultY, string Text)
         {
             buff = new Buffer(DefaultX, DefaultY);
-            colorsBuff = new List<List<CharColor>>();
-            LoadText(Text);
-            _defaultCursor = ((IBuffer)buff).defaultCursor;
+            init(Text);
         }
 
+        // IBuffer fields
         public string this[int i] => ((IBuffer)buff)[i];
 
         CursorPosition _cursor, _defaultCursor;
@@ -51,6 +67,8 @@ namespace sscpfe
 
         public CursorPosition defaultCursor => _defaultCursor;
 
+
+        // Not used methods
         public IEnumerable<string> Buff()
         {
             return ((IBuffer)buff).Buff();
@@ -58,7 +76,7 @@ namespace sscpfe
 
         public void CtrlDel()
         {
-            ((IBuffer)buff).CtrlDel(); // TODO: Fix color change
+            ((IBuffer)buff).CtrlDel();
         }
 
         public void CtrlLeftArrow()
@@ -73,7 +91,7 @@ namespace sscpfe
 
         public void Del()
         {
-            ((IBuffer)buff).Del(); // TODO: Fix color change
+            ((IBuffer)buff).Del(); 
         }
 
         public void End()
@@ -83,7 +101,7 @@ namespace sscpfe
 
         public void Enter()
         {
-            ((IBuffer)buff).Enter(); // TODO: Fix color change
+            ((IBuffer)buff).Enter();
         }
 
         public void Home()
@@ -120,6 +138,8 @@ namespace sscpfe
         {
             ((IBuffer)buff).PerformOperation(oi);
         }
+        // Not used methods
+
 
         public void Backspace()
         {
@@ -138,6 +158,7 @@ namespace sscpfe
 
         public void CtrlBackspace()
         {
+            // TODO: Insert ctrl+backspace
             throw new NotImplementedException();
         }
 
@@ -159,7 +180,15 @@ namespace sscpfe
             }
             else
             {
-                colorsBuff[cursor.YPos][cursor.XPos] = (this[cursor.YPos][cursor.XPos] == str[0]) ? CharColor.Right : CharColor.Wrong;
+                if (this[cursor.YPos][cursor.XPos] == str[0]) {
+                    colorsBuff[cursor.YPos][cursor.XPos] = CharColor.Right;
+                    if (entries[cursor.YPos][cursor.XPos] == 0) entries[cursor.YPos][cursor.XPos] = 1;
+                }
+                else
+                {
+                    colorsBuff[cursor.YPos][cursor.XPos] = CharColor.Wrong;
+                    entries[cursor.YPos][cursor.XPos] = -1;
+                }
                 _cursor.XPos += str.Length;
             }
 

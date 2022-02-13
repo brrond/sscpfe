@@ -9,31 +9,59 @@ namespace sscpfe
 
     class SSCPFETypingTestApplication : SSCPFEApplicationAbstract
     {
+        bool stopwatchThreadState;
         Thread stopwatchTread;
         string text;
-        public SSCPFETypingTestApplication() : base()
+
+        string LoadText()
         {
-            // TODO: A lot of text
             string html = new WebClient().DownloadString("https://randomtextgenerator.com/");
             string split = html.Split(new string[] { "<div id=\"randomtext_box\">" }, StringSplitOptions.None)[1].Trim();
             split = split.Split(new string[] { "<!-- RandomTextGenerator.com Top -->" }, StringSplitOptions.None)[0].Trim();
             split = split.Replace(" <br />\r\n<br />\r\n", " ");
             split = split.Replace(" \t\t\n\t\n</div>", "");
             split = split.Trim();
-            text = split;
+            text = split.Substring(0, 1500); // 1500 chars it's max
+                                             // because I used info, that the fastes
+                                             // typist was 216 wpm, so I used 300 chars * 5 = 1500
+            return text;
+        }
 
+        void PrepareNewTest()
+        {
+            text = LoadText();
             buff = new TypingTestBuffer(text);
+            if (stopwatchTread != null) stopwatchTread.Abort();
+            stopwatchThreadState = true;
             stopwatchTread = new Thread(UpdateTimer);
+        }
+
+        public SSCPFETypingTestApplication() : base()
+        {
+            PrepareNewTest();
         }
 
         void HandleEsc()
         {
-            // TODO: Add esc
+            stopwatchThreadState = false;
+            if(AskUser("Do you want to exit (y/n)>"))
+            {
+                Environment.Exit(0);
+            }
+            stopwatchThreadState = true;
         }
 
         void HandleTab()
         {
-            // TODO: Add tab
+            stopwatchThreadState = false;
+            if(AskUser("Do you want to start another test? (y/n)>"))
+            {
+                PrepareNewTest(); // TODO: Start another test after first one is done
+            }
+            else
+            {
+                stopwatchThreadState = true;
+            }
         }
 
         void UpdateTimer()
@@ -50,6 +78,9 @@ namespace sscpfe
                     Console.Title = "Done";
                     break;
                 }
+
+                if(!stopwatchThreadState) stopwatch.Stop();
+                else if(stopwatchThreadState && !stopwatch.IsRunning) stopwatch.Start();
             } while (true);
         }
 
@@ -122,13 +153,53 @@ namespace sscpfe
             }
 
             double GrossWPM = (allTypedEntries / 5.0) / 0.5;
-            double NetWPM = GrossWPM - (uncorrectedErrors / 5 / 0.5);
-            double Accuracy = correctedErrors / allTypedEntries; // TODO: Should use correct entries only
+            double NetWPM = GrossWPM - (uncorrectedErrors / 5.0 / 0.5);
 
-            Console.WriteLine("Chars : {0}\nGrossWPM : {1}\nNetWPM : {2}\nAccuracy : {3}", 
-                allTypedEntries, GrossWPM, NetWPM, Accuracy * 100);
-            Console.Read();
-            // TODO: Ask user to start again
+            int correctEntries = 0;
+            List<List<int>> entries = (buff as TypingTestBuffer).Entries;
+            for(int i = 0; i < entries.Count; i++)
+                for(int j = 0; j < entries[i].Count; j++)
+                    if (entries[i][j] == 1) correctEntries++;
+
+            double Accuracy = correctEntries / (double)allTypedEntries;
+            double CorrectedAccuracy = correctedErrors / (double)allTypedEntries;
+
+             Console.WriteLine("Chars : {0}\nGrossWPM : {1}\nNetWPM : {2}\nAccuracy : {3}\nCorrected accuracy : {4}", 
+                allTypedEntries, GrossWPM.ToString("F2"), NetWPM.ToString("F2"), (Accuracy * 100).ToString("F2"), 
+                (CorrectedAccuracy * 100).ToString("F2"));
+            Console.WriteLine("If you want to start again use TAB, or ESC to exist");
+            while (true)
+            {
+                switch (kh.Handle()) 
+                {
+                    case KeyboardHandlerCommand.UpArrow:
+                    case KeyboardHandlerCommand.DownArrow:
+                    case KeyboardHandlerCommand.LeftArrow:
+                    case KeyboardHandlerCommand.RightArrow:
+                    case KeyboardHandlerCommand.Enter:
+                    case KeyboardHandlerCommand.End:
+                    case KeyboardHandlerCommand.Home:
+                    case KeyboardHandlerCommand.CtrlV:
+                    case KeyboardHandlerCommand.CtrlLeftArrow:
+                    case KeyboardHandlerCommand.CtrlRightArrow:
+                    case KeyboardHandlerCommand.CtrlDel:
+                    case KeyboardHandlerCommand.Del:
+                    case KeyboardHandlerCommand.CtrlZ:
+                    case KeyboardHandlerCommand.CtrlY:
+                    case KeyboardHandlerCommand.Default:
+                    case KeyboardHandlerCommand.CtrlBackspace:
+                    case KeyboardHandlerCommand.Backspace:
+                        break;
+                    case KeyboardHandlerCommand.Esc:
+                        HandleEsc();
+                        break;
+                    case KeyboardHandlerCommand.Tab:
+                        HandleTab();
+                        break;
+                    default:
+                        throw new SSCPFEHandlerException();
+                }
+            }
         }
 
     }
