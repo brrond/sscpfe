@@ -19,12 +19,7 @@ namespace sscpfe
         {
             buff = new Buffer(0, YPos); // init Buffer
 
-            // set new config
-            Console.SetBufferSize(16000, 16000); // I don't know why value so "high"
-            Console.ForegroundColor = ConsoleColor.Green; // I watched Matrix recently
-            Console.OutputEncoding = Encoding.UTF8; // UTF-8 encoding
-            Console.InputEncoding = Encoding.UTF8;
-            Console.Title = "sscpfe";
+            SetDeaultConsoleCfg();
 
             operations = new OperationList();
             FName = ""; // there is no file (means new file will be created)

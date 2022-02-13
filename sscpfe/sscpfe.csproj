@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffer.cs" />
+    <Compile Include="CharColor.cs" />
     <Compile Include="CursorPosition.cs" />
     <Compile Include="DeleteOperation.cs" />
     <Compile Include="IApp.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="SSCPFEConfigurationApplication.cs" />
     <Compile Include="SSCPFEHandlerException.cs" />
     <Compile Include="SSCPFERunner.cs" />
+    <Compile Include="SSCPFETypingTestApplication.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

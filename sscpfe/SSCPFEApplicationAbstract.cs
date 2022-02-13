@@ -49,6 +49,15 @@ namespace sscpfe
             kh = new KeyboardHandler(); // init KeyboardHandler
         }
 
+        // TODO: Add in constructor?
+        protected void SetDeaultConsoleCfg()
+        {
+            Console.SetBufferSize(16000, 16000); 
+            Console.ForegroundColor = ConsoleColor.Green; 
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.InputEncoding = Encoding.UTF8;
+            Console.Title = "sscpfe";
+        }
         protected bool AskUser(string msg)
         {
             bool res;
