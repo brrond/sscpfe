@@ -20,5 +20,10 @@ namespace sscpfe
         public static CharColor Wrong => new CharColor(ConsoleColor.Black, ConsoleColor.Red);
 
         public static CharColor Right => new CharColor(ConsoleColor.Black, ConsoleColor.Green);
+
+        public static bool operator ==(CharColor ch1, CharColor ch2) => 
+            (ch1.ForegroundColor == ch2.ForegroundColor) && (ch1.BackgroundColor == ch2.BackgroundColor);
+
+        public static bool operator !=(CharColor ch1, CharColor ch2) => !(ch1 == ch2);
     }
 }

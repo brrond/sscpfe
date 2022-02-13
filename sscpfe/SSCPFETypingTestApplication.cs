@@ -1,227 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Threading;
 
 namespace sscpfe
 {
-    class TypingTestBuffer : IBuffer
-    {
-        // TODO: rename to painteble buffer (or smth) extract base class and change
-        Buffer buff;
-        List<List<CharColor>> colorsBuff;
-
-        List<string> text;
-
-        void LoadText(string Text)
-        {
-            // Function to load some Text in List<string> and then loadBuff
-            int w = Console.WindowWidth - 1; // width of Console
-            text = new List<string>(); // create list
-            for (int i = 0; i < Text.Length; i += w) // split Text by width of console blocks
-            {
-                if (i + w > Text.Length)
-                    text.Add(Text.Substring(i));
-                else
-                    text.Add(Text.Substring(i, w));
-            }
-            LoadBuff(text);
-        }
-
-        public TypingTestBuffer(string Text)
-        {
-            colorsBuff = new List<List<CharColor>>();
-            buff = new Buffer();
-            LoadText(Text);
-            _defaultCursor = ((IBuffer)buff).defaultCursor;
-        }
-
-        public TypingTestBuffer(int DefaultX, int DefaultY, string Text)
-        {
-            buff = new Buffer(DefaultX, DefaultY);
-            colorsBuff = new List<List<CharColor>>();
-            LoadText(Text);
-            _defaultCursor = ((IBuffer)buff).defaultCursor;
-        }
-
-        public string this[int i] => ((IBuffer)buff)[i];
-
-        CursorPosition _cursor, _defaultCursor;
-
-        public CursorPosition cursor => _cursor;
-
-        public CursorPosition defaultCursor => _defaultCursor;
-
-        public IEnumerable<string> Buff()
-        {
-            return ((IBuffer)buff).Buff();
-        }
-
-        public void CtrlDel()
-        {
-            ((IBuffer)buff).CtrlDel(); // TODO: Fix color change
-        }
-
-        public void CtrlLeftArrow()
-        {
-            ((IBuffer)buff).CtrlLeftArrow();
-        }
-
-        public void CtrlRightArrow()
-        {
-            ((IBuffer)buff).CtrlRightArrow();
-        }
-
-        public void Del()
-        {
-            ((IBuffer)buff).Del(); // TODO: Fix color change
-        }
-
-        public void End()
-        {
-            ((IBuffer)buff).End();
-        }
-
-        public void Enter()
-        {
-            ((IBuffer)buff).Enter(); // TODO: Fix color change
-        }
-
-        public void Home()
-        {
-            ((IBuffer)buff).Home();
-        }
-
-        public int MaxYPos()
-        {
-            return ((IBuffer)buff).MaxYPos();
-        }
-
-        public void MoveDown()
-        {
-            ((IBuffer)buff).MoveDown();
-        }
-
-        public void MoveLeft()
-        {
-            ((IBuffer)buff).MoveLeft();
-        }
-
-        public void MoveRight()
-        {
-            ((IBuffer)buff).MoveRight();
-        }
-
-        public void MoveUp()
-        {
-            ((IBuffer)buff).MoveUp();
-        }
-
-        public void PerformOperation(OperationInfo oi)
-        {
-            ((IBuffer)buff).PerformOperation(oi);
-        }
-
-        public void Backspace()
-        {
-            if(_cursor.XPos == 0 && _cursor.YPos != 0)
-            {
-                _cursor.YPos--;
-                _cursor.XPos = text[_cursor.YPos].Length - 1;
-            } 
-            else if(_cursor.XPos != 0)
-            {
-                _cursor.XPos--;
-            }
-            colorsBuff[_cursor.YPos][_cursor.XPos] = new CharColor();
-            ((IBuffer)buff).Backspace();
-        }
-
-        public void CtrlBackspace()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Insert(string str)
-        {
-            if (cursor.XPos == buff[_cursor.YPos].Length) return;
-
-            if (str == new string(' ', SSCPFEConfigurationApplication.GetTabSize()))
-            {
-                // impossible
-            }
-            else if (str.Contains("\n"))
-            {
-                // impossible
-            }
-            else if (str.Length != 1)
-            {
-                // impossible
-            }
-            else
-            {
-                colorsBuff[cursor.YPos][cursor.XPos] = (this[cursor.YPos][cursor.XPos] == str[0]) ? CharColor.Right : CharColor.Wrong;
-                _cursor.XPos += str.Length;
-            }
-
-            if(cursor.XPos == Console.WindowWidth - 1)
-            {
-                _cursor.XPos = 0;
-                _cursor.YPos++;
-            }
-        }
-
-        public void LoadBuff(List<string> buff)
-        {
-            ((IBuffer)this.buff).LoadBuff(buff);
-            foreach (string str in this.Buff())
-            {
-                List<CharColor> charColors = new List<CharColor>();
-                foreach (char ch in str) charColors.Add(new CharColor());
-                colorsBuff.Add(charColors);
-            }
-        }
-
-        public void Print()
-        {
-            // TODO: Change to firstPrint and Print (another print with curr line only)
-            Console.SetCursorPosition(defaultCursor.XPos, defaultCursor.YPos);
-            for (int i = 0; i < text.Count; i++)
-            {
-                for (int j = 0; j < text[i].Length; j++) 
-                {
-                    char ch = text[i][j];
-                    Console.ForegroundColor = colorsBuff[i][j].ForegroundColor;
-                    Console.BackgroundColor = colorsBuff[i][j].BackgroundColor;
-                    Console.Write(ch);
-                }
-                Console.SetCursorPosition(0, defaultCursor.YPos + i + 1);
-            }
-            Console.SetCursorPosition(defaultCursor.XPos + cursor.XPos, defaultCursor.YPos + cursor.YPos);
-        }
-    }
 
     class SSCPFETypingTestApplication : SSCPFEApplicationAbstract
     {
+        Thread stopwatchTread;
+        string text;
         public SSCPFETypingTestApplication() : base()
         {
             SetDeaultConsoleCfg();
-            buff = new TypingTestBuffer("Some random text here and there, here and there, here and there... Some random text here and there, here and there, here and there...");
+
+            // TODO: A lot of text
+            string html = new WebClient().DownloadString("https://randomtextgenerator.com/");
+            string split = html.Split(new string[] { "<div id=\"randomtext_box\">" }, StringSplitOptions.None)[1].Trim();
+            split = split.Split(new string[] { "<!-- RandomTextGenerator.com Top -->" }, StringSplitOptions.None)[0].Trim();
+            split = split.Replace(" <br />\r\n<br />\r\n", " ");
+            split = split.Replace(" \t\t\n\t\n</div>", "");
+            split = split.Trim();
+            text = split;
+
+            buff = new TypingTestBuffer(text);
+            stopwatchTread = new Thread(UpdateTimer);
         }
 
         void HandleEsc()
         {
-
+            // TODO: Add esc
         }
 
         void HandleTab()
         {
+            // TODO: Add tab
+        }
 
+        void UpdateTimer()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            do
+            {
+                double elapsed = stopwatch.Elapsed.TotalSeconds;
+                Console.Title = elapsed.ToString();
+                if(elapsed >= 30)
+                {
+                    stopwatch.Stop();
+                    Console.Title = "Done";
+                    break;
+                }
+            } while (true);
         }
 
         public override void Mainloop()
         {
             while (true)
             {
-                buff.Print();
+                buff.Print();                
+                if(stopwatchTread.ThreadState == System.Threading.ThreadState.Stopped) break;
 
                 switch (kh.Handle()) // get input from user
                 {
@@ -244,6 +83,7 @@ namespace sscpfe
                         HandleEsc();
                         break;
                     case KeyboardHandlerCommand.Default:
+                        if (stopwatchTread.ThreadState == System.Threading.ThreadState.Unstarted) stopwatchTread.Start();
                         buff.Insert("" + kh.LastKeyChar); 
                         break;
                     case KeyboardHandlerCommand.CtrlBackspace:
@@ -259,32 +99,39 @@ namespace sscpfe
                         throw new SSCPFEHandlerException();
                 }
             }
-                // TODO: add
-                // test will take 30 sec so it necessary to have
-                // text about 250-300 words (it's impossible to rich)
-                //
-                // there will be only 5 commands:
-                // tab (to start new test)
-                // esc (to exit)
-                // default
-                // backspace (del prev char)
-                // ctrl + backspace (del prev word)
 
-                // After text is loaded it'll be loaded into buffer
-                // (file or manually i don't know)
-                // after that cursor will be place at (0; 0)
-                // when you click the right char it will change color
-                // if it's right char - green background and black fg
-                // if not - red bg and ? fg
+            // clear console from text
+            Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos);
+            var it = buff.Buff().GetEnumerator();
+            while (it.MoveNext()) Console.WriteLine(new string(' ', 1000));
+            Console.WriteLine(new string(' ', 1000));
+            Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos); // + 2?
 
-                // What about mistakes? (accuracy)
-
-                // After 30 seconds (where is timer? (in title of cmd?))
-                // the test'll automaticaly stop and result'll be displayed
-                // with wpm (how to calc. wpm?)
-                // with accuracy (?)
-                // ask user to start again or exit
+            // calculate wpm
+            int allTypedEntries = 0;
+            int uncorrectedErrors = 0;
+            int correctedErrors = 0;
+            List<List<CharColor>> colors = (buff as TypingTestBuffer).ColorsBuff;
+            for (int i = 0; i < colors.Count; i++)
+            {
+                for (int j = 0; j < colors[i].Count; j++)
+                {
+                    if (colors[i][j] == CharColor.Wrong) uncorrectedErrors++;
+                    else if (colors[i][j] == CharColor.Right) correctedErrors++;
+                    else break;
+                    allTypedEntries++;
+                }
             }
+
+            double GrossWPM = (allTypedEntries / 5.0) / 0.5;
+            double NetWPM = GrossWPM - (uncorrectedErrors / 5 / 0.5);
+            double Accuracy = correctedErrors / allTypedEntries; // TODO: Should use correct entries only
+
+            Console.WriteLine("Chars : {0}\nGrossWPM : {1}\nNetWPM : {2}\nAccuracy : {3}", 
+                allTypedEntries, GrossWPM, NetWPM, Accuracy * 100);
+            Console.Read();
+            // TODO: Ask user to start again
+        }
 
     }
 }
