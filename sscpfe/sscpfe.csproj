@@ -52,9 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffer.cs" />
+    <Compile Include="CharColor.cs" />
     <Compile Include="CursorPosition.cs" />
     <Compile Include="DeleteOperation.cs" />
     <Compile Include="IApp.cs" />
+    <Compile Include="IBuffer.cs" />
     <Compile Include="InsertOperation.cs" />
     <Compile Include="KeyboardHandlerCommand.cs" />
     <Compile Include="KeyboardHandler.cs" />
@@ -64,10 +66,13 @@
     <Compile Include="OperationInfo.cs" />
     <Compile Include="OperationList.cs" />
     <Compile Include="SSCPFEApplication.cs" />
+    <Compile Include="SSCPFEApplicationAbstract.cs" />
     <Compile Include="SSCPFEBinaryReaderApplication.cs" />
     <Compile Include="SSCPFEConfigurationApplication.cs" />
     <Compile Include="SSCPFEHandlerException.cs" />
     <Compile Include="SSCPFERunner.cs" />
+    <Compile Include="SSCPFETypingTestApplication.cs" />
+    <Compile Include="TypingTestBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

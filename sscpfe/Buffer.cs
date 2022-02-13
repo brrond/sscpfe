@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace sscpfe
 {
-    class Buffer
+    class Buffer : IBuffer
     {
         List<string> buff;          // list of strings
         int newLineCounter = 0;
@@ -26,10 +25,12 @@ namespace sscpfe
         }
 
         // positions of cursor
-        public CursorPosition cursor;
+        CursorPosition cursor;
 
-        // save for reset
-        public CursorPosition defaultCursor;
+        CursorPosition defaultCursor;
+
+        CursorPosition IBuffer.cursor { get { return cursor; } }
+        CursorPosition IBuffer.defaultCursor { get { return defaultCursor; } }
 
         // get string by i
         public string this[int i]
@@ -234,7 +235,7 @@ namespace sscpfe
 
         void ClearConsole()
         {
-            // TODO: Fix magical 1000
+            // TODO: Fix magic 1000
             // This works with one line
             // I DONT KNOW WHAT THE HECK
             //buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
