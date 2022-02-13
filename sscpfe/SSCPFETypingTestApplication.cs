@@ -132,7 +132,7 @@ namespace sscpfe
             // clear console from text
             Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos);
             var it = buff.Buff().GetEnumerator();
-            while (it.MoveNext()) Console.WriteLine(new string(' ', 1000));
+            while (it.MoveNext()) Console.WriteLine(new string(' ', 1000)); // TODO: Fix magic 1000
             Console.WriteLine(new string(' ', 1000));
             Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos); // + 2?
 

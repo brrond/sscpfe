@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace sscpfe
 {
@@ -236,7 +235,7 @@ namespace sscpfe
 
         void ClearConsole()
         {
-            // TODO: Fix magical 1000
+            // TODO: Fix magic 1000
             // This works with one line
             // I DONT KNOW WHAT THE HECK
             //buff.Add(CreateEmptyLine(1000));// Create new empty line (1000?)
