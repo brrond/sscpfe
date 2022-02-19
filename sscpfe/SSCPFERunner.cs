@@ -29,6 +29,8 @@ namespace sscpfe
                 case ARGSHandlerCommand.ENCODING:
                     app = new SSCPFEApplication(args[2], ParseEncoding(args[1]));
                     break;
+                case ARGSHandlerCommand.ENCODINGS:
+                    break;
                 case ARGSHandlerCommand.BINARY:
                     app = new SSCPFEBinaryReaderApplication(args[1]);
                     break;
@@ -48,17 +50,24 @@ namespace sscpfe
 
         private Encoding ParseEncoding(string str)
         {
-            str = str.Trim().ToLower();
-            if (str == "ascii")
+            // this method gets encoding from user input
+            // the problem is we have two possible input types
+            // 1. Code of the encoding
+            // 2. Name of the encoding
+            try
+            {
+                str = str.Trim().ToLower(); // preprocess string
+                int code;
+                if (int.TryParse(str, out code)) // if we have code
+                    return Encoding.GetEncoding(code); // try to return encoding by code
+                return Encoding.GetEncoding(str); // try to return encoding by name
+            } catch(Exception e) // If user doesn't pay attention
+            {
+                Console.WriteLine("Incorrect encoding: {0}", str);
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Use sscpfe /e to see all available encodings");
                 return Encoding.ASCII;
-            else if (str == "utf16" || str == "utf-16")
-                return Encoding.Unicode;
-            else if (str == "utf7" || str == "utf-7")
-                return Encoding.UTF7;
-            else if (str == "utf32" || str == "utf-32")
-                return Encoding.UTF32;
-
-            return Encoding.UTF8;
+            }
         }
 
         ARGSHandlerCommand handleARGS()
@@ -68,18 +77,27 @@ namespace sscpfe
             //sscpfe /help                      // DONE
             //sscpfe /b file_name               // DONE
             //sscpfe /e encoding file_name      // DONE
+            //sscpfe /e                         // DONE
             //sscpfe jkfajfkejfeifjeiffjeifj    // DONE
             //sscpfe /cfg                       // DONE
-            //sscpfe /typingtest                //
+            //sscpfe /typingtest                // DONE
             if (args.Length != 0)
             {
-                if((args[0].ToLower() == "/b" || args[0].ToLower() == "-b") && args.Length == 2)
+                if((args[0].ToLower() == "/b") && args.Length == 2)
                 {
                     return ARGSHandlerCommand.BINARY; 
                 }
-                else if((args[0].ToLower() == "/e" || args[0].ToLower() == "-e") && args.Length == 3)
+                else if((args[0].ToLower() == "/e") && args.Length == 3)
                 {
                     return ARGSHandlerCommand.ENCODING;
+                }
+                else if((args[0].ToLower() == "/e") && args.Length == 1)
+                {
+                    Console.WriteLine("All available encodings");
+                    Console.WriteLine("CodePage Name");
+                    foreach (EncodingInfo ei in Encoding.GetEncodings())
+                        Console.WriteLine("{0,-8} {1,-25} ", ei.CodePage, ei.Name);
+                    return ARGSHandlerCommand.ENCODINGS;
                 }
                 else if((args[0].ToLower() == "/cfg"))
                 {

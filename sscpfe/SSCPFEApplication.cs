@@ -91,6 +91,8 @@ namespace sscpfe
             Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos + buff.MaxYPos() + 2);
             if (AskUser("Do you want to save current buffer (Y/n) > ")) // simple handle
             {
+                Console.InputEncoding = inputEncoding;
+                Console.OutputEncoding = outputEncoding;
                 Regex fileNameRegex = new Regex("[a-zA-Z0-9\\-. _]*\\.[a-zA-Z0-9\\-. _]+");
                 while (true) // loop so user WILL enter file name
                 {

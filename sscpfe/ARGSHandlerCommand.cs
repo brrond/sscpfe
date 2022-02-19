@@ -6,6 +6,7 @@
         HELP,
         FILE,
         ENCODING,
+        ENCODINGS,
         BINARY,
         CFG,
         MONKEYTYPE
