@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace sscpfe
@@ -39,17 +40,16 @@ namespace sscpfe
                 //|-----------------------------------------------------------------|
                 //|00000000|00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00|00000000|
                 //-------------------------------------------------------------------
-
                 string hLine = new string('-', 16 * 3 - 1 + 2 + 16 + 8);
                 Console.WriteLine("-{0}-", hLine);
                 Console.WriteLine("|{0,8}|{1,47}|{2,16}|", "addr", "values", "char");
                 Console.WriteLine("|{0}|", hLine);
                 using (FileStream fileStream = new FileStream(FName, FileMode.Open))
-                using (StreamReader reader = new StreamReader(fileStream))
+                using (StreamReader reader = new StreamReader(fileStream, Encoding.ASCII))
                 {
                     int position = 0;
                     string str = "";
-                    while(reader.Peek() != -1)
+                    while (reader.Peek() != -1)
                     {
                         int currChar = reader.Read();
                         str += (char)currChar;
@@ -58,7 +58,7 @@ namespace sscpfe
                         else
                             Console.Write(" {0,2}", currChar.ToString("X2"));
 
-                        if((position + 1) % 16 == 0)
+                        if ((position + 1) % 16 == 0)
                         {
                             str = Regex.Replace(str, @"[^\u0000-\u007F]+", ".").
                                 Replace('\n', '.').Replace('\r', '.').Replace('\t', '.');
@@ -68,7 +68,7 @@ namespace sscpfe
 
                         position++;
                     }
-                    if(str != "")
+                    if (str != "")
                     {
                         str = Regex.Replace(str, @"[^\u0000-\u007F]+", ".").
                                 Replace('\n', '.').Replace('\r', '.').Replace('\t', '.');
