@@ -73,16 +73,17 @@ namespace sscpfe
         // print buffer
         public void Print()
         {
-            Console.SetCursorPosition(defaultCursor.XPos, defaultCursor.YPos);
-            for(int i = 0; i < buff.Count; i++)
+            // TODO: Print only Console.LargestWindowHeight
+            Console.SetCursorPosition(0, cursor.YPos);
+            int some = Console.LargestWindowHeight;
+            for(int i = 0; i < buff.Count && i < Console.LargestWindowHeight; i++)
             {
                 Console.WriteLine(buff[i]);
                 buff[i] = buff[i].Split('\0')[0];
             }
-            //if (newLineFlag)
+            
             while(newLineCounter != 0)
             {
-                //newLineFlag = false;
                 buff.RemoveAt(buff.Count - 1);
                 newLineCounter--;
             }
