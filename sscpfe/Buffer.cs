@@ -8,6 +8,9 @@ namespace sscpfe
         List<string> buff;          // list of strings
         int newLineCounter = 0;
 
+        bool firstPrint = true; // indicates if it's first time we print text
+                                // see print method for more information
+
         public Buffer()
         {
             buff = new List<string>
@@ -70,19 +73,16 @@ namespace sscpfe
             return line;
         }
 
-        // print buffer
-        public void Print()
+        private void FullPrint()
         {
-            // TODO: Print only Console.LargestWindowHeight
-            Console.SetCursorPosition(0, cursor.YPos);
-            int some = Console.LargestWindowHeight;
-            for(int i = 0; i < buff.Count && i < Console.LargestWindowHeight; i++)
+            Console.SetCursorPosition(0, defaultCursor.YPos);
+            for(int i = 0; i < buff.Count; i++)
             {
                 Console.WriteLine(buff[i]);
                 buff[i] = buff[i].Split('\0')[0];
             }
-            
-            while(newLineCounter != 0)
+
+            while (newLineCounter != 0)
             {
                 buff.RemoveAt(buff.Count - 1);
                 newLineCounter--;
@@ -90,6 +90,34 @@ namespace sscpfe
             Console.SetCursorPosition(defaultCursor.XPos + cursor.XPos, defaultCursor.YPos + cursor.YPos);
         }
 
+        // print buffer
+        public void Print()
+        {
+            // This mehotod prints buffer
+            // If it's first print or we have new line indecator 
+            // FullPrint method works (prints everything in file)
+            // This method prints only this string
+            // Works fast enough
+
+            if(firstPrint)
+            {
+                FullPrint();
+                firstPrint = false;
+                return;
+            }
+
+            if(newLineCounter != 0)
+            {
+                FullPrint();
+                return;
+            }
+
+            Console.SetCursorPosition(0, cursor.YPos);
+            Console.WriteLine(buff[cursor.YPos]);
+            buff[cursor.YPos] = buff[cursor.YPos].Split('\0')[0];
+
+            Console.SetCursorPosition(defaultCursor.XPos + cursor.XPos, defaultCursor.YPos + cursor.YPos);
+        }
 
         void MultilineInsert(string str)
         {
