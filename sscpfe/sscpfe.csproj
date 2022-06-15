@@ -52,6 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buffer\Buffer.cs" />
+    <Compile Include="Buffer\IDeletable.cs" />
+    <Compile Include="Buffer\IEditorBuffer.cs" />
+    <Compile Include="Buffer\IMovable.cs" />
     <Compile Include="Util\CharColor.cs" />
     <Compile Include="Util\CursorPosition.cs" />
     <Compile Include="Operation\DeleteOperation.cs" />

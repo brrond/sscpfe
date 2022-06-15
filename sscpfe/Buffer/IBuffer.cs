@@ -13,25 +13,10 @@ namespace sscpfe
 
         int MaxYPos();
 
-
         void Print();
         void Insert(string str);
-        void Backspace();
-        void CtrlBackspace();
-        void Del();
-        void CtrlDel();
 
         void Enter();
-
-        void MoveUp();
-        void MoveDown();
-        void MoveLeft();
-        void MoveRight();
-        void Home();
-        void End();
-
-        void CtrlLeftArrow();
-        void CtrlRightArrow();
 
         void PerformOperation(OperationInfo oi);
     }

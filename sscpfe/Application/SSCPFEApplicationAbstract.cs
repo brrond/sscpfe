@@ -19,7 +19,7 @@ namespace sscpfe
         protected Encoding encoding = Encoding.UTF8;
 
         // 
-        protected IBuffer buff;
+        protected IEditorBuffer buff;
         protected KeyboardHandler kh;
 
         protected SSCPFEApplicationAbstract()

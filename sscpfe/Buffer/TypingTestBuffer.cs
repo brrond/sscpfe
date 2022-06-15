@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace sscpfe
 {
-    class TypingTestBuffer : IBuffer
+    class TypingTestBuffer : IEditorBuffer
     {
         // Fields
-        Buffer buff;
+        readonly Buffer buff;
         List<List<CharColor>> colorsBuff;
         List<List<int>> entries; // 0 - not found
                                  // 1 - true
@@ -76,27 +77,27 @@ namespace sscpfe
 
         public void CtrlDel()
         {
-            ((IBuffer)buff).CtrlDel();
+            ((IDeletable)buff).CtrlDel();
         }
 
         public void CtrlLeftArrow()
         {
-            ((IBuffer)buff).CtrlLeftArrow();
+            ((IMovable)buff).CtrlLeftArrow();
         }
 
         public void CtrlRightArrow()
         {
-            ((IBuffer)buff).CtrlRightArrow();
+            ((IMovable)buff).CtrlRightArrow();
         }
 
         public void Del()
         {
-            ((IBuffer)buff).Del(); 
+            ((IDeletable)buff).Del(); 
         }
 
         public void End()
         {
-            ((IBuffer)buff).End();
+            ((IMovable)buff).End();
         }
 
         public void Enter()
@@ -106,7 +107,7 @@ namespace sscpfe
 
         public void Home()
         {
-            ((IBuffer)buff).Home();
+            ((IMovable)buff).Home();
         }
 
         public int MaxYPos()
@@ -116,22 +117,22 @@ namespace sscpfe
 
         public void MoveDown()
         {
-            ((IBuffer)buff).MoveDown();
+            ((IMovable)buff).MoveDown();
         }
 
         public void MoveLeft()
         {
-            ((IBuffer)buff).MoveLeft();
+            ((IMovable)buff).MoveLeft();
         }
 
         public void MoveRight()
         {
-            ((IBuffer)buff).MoveRight();
+            ((IMovable)buff).MoveRight();
         }
 
         public void MoveUp()
         {
-            ((IBuffer)buff).MoveUp();
+            ((IMovable)buff).MoveUp();
         }
 
         public void PerformOperation(OperationInfo oi)
@@ -153,7 +154,7 @@ namespace sscpfe
                 _cursor.XPos--;
             }
             colorsBuff[_cursor.YPos][_cursor.XPos] = new CharColor();
-            ((IBuffer)buff).Backspace();
+            ((IDeletable)buff).Backspace();
         }
 
         public void CtrlBackspace()
@@ -204,8 +205,7 @@ namespace sscpfe
             ((IBuffer)this.buff).LoadBuff(buff);
             foreach (string str in this.Buff())
             {
-                List<CharColor> charColors = new List<CharColor>();
-                foreach (char ch in str) charColors.Add(new CharColor());
+                List<CharColor> charColors = (from char ch in str select new CharColor()).ToList();
                 colorsBuff.Add(charColors);
             }
         }

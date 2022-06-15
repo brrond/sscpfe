@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace sscpfe
 {
-    class Buffer : IBuffer
+    class Buffer : IEditorBuffer
     {
         List<string> buff;          // list of strings
         int newLineCounter = 0;
