@@ -51,28 +51,28 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Buffer.cs" />
-    <Compile Include="CharColor.cs" />
-    <Compile Include="CursorPosition.cs" />
-    <Compile Include="DeleteOperation.cs" />
-    <Compile Include="IApp.cs" />
-    <Compile Include="IBuffer.cs" />
-    <Compile Include="InsertOperation.cs" />
-    <Compile Include="KeyboardHandlerCommand.cs" />
-    <Compile Include="KeyboardHandler.cs" />
+    <Compile Include="Buffer\Buffer.cs" />
+    <Compile Include="Util\CharColor.cs" />
+    <Compile Include="Util\CursorPosition.cs" />
+    <Compile Include="Operation\DeleteOperation.cs" />
+    <Compile Include="Application\IApp.cs" />
+    <Compile Include="Buffer\IBuffer.cs" />
+    <Compile Include="Operation\InsertOperation.cs" />
+    <Compile Include="Util\KeyboardHandlerCommand.cs" />
+    <Compile Include="Util\KeyboardHandler.cs" />
     <Compile Include="MainClass.cs" />
-    <Compile Include="ARGSHandlerCommand.cs" />
-    <Compile Include="Operation.cs" />
-    <Compile Include="OperationInfo.cs" />
-    <Compile Include="OperationList.cs" />
-    <Compile Include="SSCPFEApplication.cs" />
-    <Compile Include="SSCPFEApplicationAbstract.cs" />
-    <Compile Include="SSCPFEBinaryReaderApplication.cs" />
-    <Compile Include="SSCPFEConfigurationApplication.cs" />
-    <Compile Include="SSCPFEHandlerException.cs" />
+    <Compile Include="Util\ARGSHandlerCommand.cs" />
+    <Compile Include="Operation\Operation.cs" />
+    <Compile Include="Operation\OperationInfo.cs" />
+    <Compile Include="Operation\OperationList.cs" />
+    <Compile Include="Application\SSCPFEApplication.cs" />
+    <Compile Include="Application\SSCPFEApplicationAbstract.cs" />
+    <Compile Include="Application\SSCPFEBinaryReaderApplication.cs" />
+    <Compile Include="Application\SSCPFEConfigurationApplication.cs" />
+    <Compile Include="Util\SSCPFEHandlerException.cs" />
     <Compile Include="SSCPFERunner.cs" />
-    <Compile Include="SSCPFETypingTestApplication.cs" />
-    <Compile Include="TypingTestBuffer.cs" />
+    <Compile Include="Application\SSCPFETypingTestApplication.cs" />
+    <Compile Include="Buffer\TypingTestBuffer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
