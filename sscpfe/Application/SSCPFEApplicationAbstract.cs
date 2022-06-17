@@ -40,7 +40,7 @@ namespace sscpfe
                 Console.ForegroundColor = cF;
                 Console.BackgroundColor = cB;
                 Console.SetBufferSize(bufferWidth, bufferHeight);
-                Console.SetCursorPosition(0, YPos + buff.MaxYPos() + 5);
+                Console.SetCursorPosition(0, YPos + Console.WindowHeight + 7);
                 Console.OutputEncoding = outputEncoding;
                 Console.InputEncoding = inputEncoding;
                 Console.Title = title;
@@ -49,7 +49,7 @@ namespace sscpfe
             kh = new KeyboardHandler(); // init KeyboardHandler
 
             // set default console cfg
-            Console.SetBufferSize(16000, 16000);
+            Console.SetBufferSize(Console.WindowWidth + 1, Console.BufferHeight);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;

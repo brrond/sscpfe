@@ -87,8 +87,8 @@ namespace sscpfe
 
         void HandleEsc()
         {
-            // user pressed ESC
-            Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos + buff.MaxYPos() + 2);
+            // user pressed ESC                                                        + buff.MaxYPos()
+            Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos + Console.WindowHeight + 2);
             if (AskUser("Do you want to save current buffer (Y/n) > ")) // simple handle
             {
                 Console.InputEncoding = inputEncoding;
@@ -213,6 +213,7 @@ namespace sscpfe
                         buff.CtrlRightArrow();
                         break;
                     case KeyboardHandlerCommand.CtrlDel:
+                        // TODO: Fix ctrlDel (works not the same way as in Buffer)
                         if (xPosBefore != buff[yPosBefore].Length)
                         {
                             if (buff[yPosBefore][xPosBefore] != ' ')

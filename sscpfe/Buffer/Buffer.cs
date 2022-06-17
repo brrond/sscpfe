@@ -75,48 +75,64 @@ namespace sscpfe
 
         private void FullPrint()
         {
-            Console.SetCursorPosition(0, defaultCursor.YPos);
-            for(int i = 0; i < buff.Count; i++)
+            // clear one screen
+            Console.SetCursorPosition(0, defaultCursor.YPos + 1);
+            for (int i = 0; i < Console.WindowHeight; i++) Console.WriteLine(new string(' ', rightBorder));
+
+            // print one screen
+            Console.SetCursorPosition(0, defaultCursor.YPos + 1);
+            for (int i = printFrom; i < printFrom + Console.WindowHeight; i++)
             {
-                Console.WriteLine(buff[i]);
+                string baseString = buff[i];
+                int pos = cursor.XPos / rightBorder * rightBorder;
+                string stringToPrint = baseString.Substring(pos, Math.Min(baseString.Length - pos, rightBorder));
+                Console.WriteLine(stringToPrint);
                 buff[i] = buff[i].Split('\0')[0];
             }
 
+            // remove duplicates
             while (newLineCounter != 0)
             {
                 buff.RemoveAt(buff.Count - 1);
                 newLineCounter--;
             }
-            Console.SetCursorPosition(defaultCursor.XPos + cursor.XPos, defaultCursor.YPos + cursor.YPos);
         }
+
+        int printFrom = 0;
+        int rightBorder = Console.WindowWidth;
 
         // print buffer
         public void Print()
         {
-            // This mehotod prints buffer
-            // If it's first print or we have new line indecator 
-            // FullPrint method works (prints everything in file)
-            // This method prints only this string
-            // Works fast enough
-
+            // if this our first print
             if(firstPrint)
             {
                 FullPrint();
                 firstPrint = false;
-                return;
             }
 
+            // if we have new lines (actually I don't sure about this one)
+            // it can be replaced with much faster algo
             if(newLineCounter != 0)
             {
-                FullPrint();
-                return;
+                FullPrint(); // reprint whole screen
             }
 
-            Console.SetCursorPosition(0, cursor.YPos);
-            Console.WriteLine(buff[cursor.YPos]);
+            // commented old variant maybe it's good enough
+            // if we out of line OR we reached the beginning of the line
+            //if (cursor.XPos > rightBorder || cursor.XPos % rightBorder == 0)
+            //{
+            // then reprint current line
+            Console.SetCursorPosition(0, cursor.YPos - printFrom + defaultCursor.YPos + 1);
+            Console.WriteLine(new string(' ', rightBorder));
+            Console.SetCursorPosition(0, cursor.YPos - printFrom + defaultCursor.YPos + 1);
+            string baseString = buff[cursor.YPos];
+            int pos = cursor.XPos / rightBorder * rightBorder;
+            string stringToPrint = baseString.Substring(pos, Math.Min(baseString.Length - pos, rightBorder));
+            Console.WriteLine(stringToPrint);
+            //}
+            Console.SetCursorPosition(cursor.XPos % rightBorder, cursor.YPos - printFrom + defaultCursor.YPos + 1);
             buff[cursor.YPos] = buff[cursor.YPos].Split('\0')[0];
-
-            Console.SetCursorPosition(defaultCursor.XPos + cursor.XPos, defaultCursor.YPos + cursor.YPos);
         }
 
         void MultilineInsert(string str)
@@ -204,7 +220,7 @@ namespace sscpfe
             // delete some inappropriate symbol
             else if (buff[cursor.YPos].Length == 0)
             {
-                //***buff[YPos] = CreateEmptyLine(1);
+                buff[cursor.YPos] += CreateEmptyLine(1);
             }
         }
 
@@ -258,7 +274,7 @@ namespace sscpfe
             // delete some inappropriate symbol
             else if (buff[cursor.YPos].Length == 0)
             {
-                //***buff[YPos] = CreateEmptyLine(1);
+                buff[cursor.YPos] += CreateEmptyLine(1);
             }
         }
 
@@ -310,6 +326,11 @@ namespace sscpfe
                 cursor.YPos--;
                 if (cursor.XPos > buff[cursor.YPos].Length)
                     cursor.XPos = buff[cursor.YPos].Length;
+                if (cursor.YPos == printFrom && printFrom != 0)
+                {
+                    printFrom--;
+                    newLineCounter++;
+                }
             }
         }
 
@@ -320,6 +341,11 @@ namespace sscpfe
                 cursor.YPos++;
                 if (cursor.XPos > buff[cursor.YPos].Length)
                     cursor.XPos = buff[cursor.YPos].Length;
+                if (cursor.YPos == printFrom + Console.WindowHeight)
+                {
+                    printFrom++;
+                    newLineCounter++;
+                }
             }
         }
 
