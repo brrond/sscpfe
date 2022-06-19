@@ -72,26 +72,32 @@ namespace sscpfe
 
         ARGSHandlerCommand handleARGS()
         {
-            //sscpfe                            // DONE
-            //sscpfe file_name                  // DONE
-            //sscpfe /help                      // DONE
-            //sscpfe /b file_name               // DONE
-            //sscpfe /e encoding file_name      // DONE
-            //sscpfe /e                         // DONE
-            //sscpfe jkfajfkejfeifjeiffjeifj    // DONE
-            //sscpfe /cfg                       // DONE
-            //sscpfe /typingtest                // DONE
+            //sscpfe                            // DONE - open editor
+            //sscpfe file_name                  // DONE - open file `file_name` in editor
+            //sscpfe /help                      // DONE - show help
+            //sscpfe /b file_name               // DONE - read file `file_name` in binary format
+            //sscpfe /e encoding file_name      // DONE - open file `file_name` with encoding `encoding` in editor
+            //sscpfe /e                         // DONE - show all available encodings
+            //sscpfe jkfajfkejfeifjeiffjeifj    // DONE - open this file (create new)
+            //sscpfe /cfg                       // DONE - open cfg app
+            //sscpfe /typingtest                // DONE - open typingtest app
             if (args.Length != 0)
             {
-                if((args[0].ToLower() == "/b") && args.Length == 2)
+                if((args[0].ToLower() == "/b" || 
+                    args[0].ToLower() == "-b" ||
+                    args[0].ToLower() == "--binary") && args.Length == 2) 
                 {
                     return ARGSHandlerCommand.BINARY; 
                 }
-                else if((args[0].ToLower() == "/e") && args.Length == 3)
+                else if((args[0].ToLower() == "/e" ||
+                    args[0].ToLower() == "-e" ||
+                    args[0].ToLower() == "--encoding") && args.Length == 3)
                 {
                     return ARGSHandlerCommand.ENCODING;
                 }
-                else if((args[0].ToLower() == "/e") && args.Length == 1)
+                else if((args[0].ToLower() == "/e" ||
+                    args[0].ToLower() == "-e" ||
+                    args[0].ToLower() == "--encoding") && args.Length == 1)
                 {
                     Console.WriteLine("All available encodings");
                     Console.WriteLine("CodePage Name");
@@ -99,15 +105,22 @@ namespace sscpfe
                         Console.WriteLine("{0,-8} {1,-25} ", ei.CodePage, ei.Name);
                     return ARGSHandlerCommand.ENCODINGS;
                 }
-                else if((args[0].ToLower() == "/cfg"))
+                else if(args[0].ToLower() == "/cfg" ||
+                    args[0].ToLower() == "-cfg" || 
+                    args[0].ToLower() == "--configuration")
                 {
                     return ARGSHandlerCommand.CFG;
                 }
-                else if((args[0].ToLower() == "/typingtest"))
+                else if(args[0].ToLower() == "--typingtest" ||
+                    args[0].ToLower() == "/tt" ||
+                    args[0].ToLower() == "-tt")
                 {
                     return ARGSHandlerCommand.MONKEYTYPE;
                 }
-                if (args[0].ToLower()[0] == '/')
+                if (args[0].ToLower()[0] == '/' ||
+                    args[0].ToLower() == "-h" ||
+                    args[0].ToLower() == "--help" ||
+                    args[0].ToLower() == "/?")
                     return ARGSHandlerCommand.HELP;
                 return ARGSHandlerCommand.FILE;
             }
@@ -116,9 +129,19 @@ namespace sscpfe
 
         public static void ShowHelp()
         {
-            Console.WriteLine("Super simple command promt file editor (sscpfe)");
-            Console.WriteLine("There are no commands actually. Just type 'sscpfe' as command and start entering your text.");
-            Console.WriteLine("Also you can edit file by typing its name after 'sscpfe' command (sscpfe some_text.txt)");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("Super simple command promt file editor (sscpfe)");
+            stringBuilder.AppendLine("https://github.com/greentech72/sscpfe.git");
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("sscpfe [filename] [-b filename] [-e] [-e filename] [-cfg] [-tt] [-h]");
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("filename                      - specify file to open or to create");
+            stringBuilder.AppendLine("-b, --binary, /b              - read file as binary");
+            stringBuilder.AppendLine("-e, --encoding, /e            - open file in specific encoding OR print all available encodings");
+            stringBuilder.AppendLine("-cfg, --configuration, /cfg   - open configuration app. Allows to change options of editor");
+            stringBuilder.AppendLine("-tt, --typingtest, /tt        - try it yourself (you need internet for this one)");
+            stringBuilder.AppendLine("-h, --help, /?                - show help");
+            Console.WriteLine(stringBuilder.ToString());
         }
     }
 }
