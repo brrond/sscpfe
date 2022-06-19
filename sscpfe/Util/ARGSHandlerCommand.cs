@@ -9,6 +9,7 @@
         ENCODINGS,
         BINARY,
         CFG,
-        MONKEYTYPE
+        MONKEYTYPE,
+        MONKEYTYPE_WITH_LANGUAGE
     }
 }

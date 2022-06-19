@@ -40,6 +40,9 @@ namespace sscpfe
                 case ARGSHandlerCommand.MONKEYTYPE:
                     app = new SSCPFETypingTestApplication();
                     break;
+                case ARGSHandlerCommand.MONKEYTYPE_WITH_LANGUAGE:
+                    app = new SSCPFETypingTestApplication(args[1]);
+                    break;
                 default:
                     break;
             }
@@ -81,6 +84,7 @@ namespace sscpfe
             //sscpfe jkfajfkejfeifjeiffjeifj    // DONE - open this file (create new)
             //sscpfe /cfg                       // DONE - open cfg app
             //sscpfe /typingtest                // DONE - open typingtest app
+            //sscpfe /typingtest language       // DONE - open typingtest app with language
             if (args.Length != 0)
             {
                 if((args[0].ToLower() == "/b" || 
@@ -111,7 +115,13 @@ namespace sscpfe
                 {
                     return ARGSHandlerCommand.CFG;
                 }
-                else if(args[0].ToLower() == "--typingtest" ||
+                else if((args[0].ToLower() == "--typingtest" ||
+                    args[0].ToLower() == "/tt" ||
+                    args[0].ToLower() == "-tt") && args.Length == 2)
+                {
+                    return ARGSHandlerCommand.MONKEYTYPE_WITH_LANGUAGE;
+                }
+                else if (args[0].ToLower() == "--typingtest" ||
                     args[0].ToLower() == "/tt" ||
                     args[0].ToLower() == "-tt")
                 {

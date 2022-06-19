@@ -15,7 +15,7 @@ namespace sscpfe
     {
         bool stopwatchThreadState;
         Thread stopwatchTread;
-        string text;
+        string language = null, text;
 
         bool IsConnectedToInternet()
         {
@@ -23,49 +23,62 @@ namespace sscpfe
             return googlePing.Send("google.com").Status == IPStatus.Success;
         }
 
-        string LoadText()
+        static void DownloadText(string language)
         {
-            if (IsConnectedToInternet()) // if device has internet access
+            try
             {
-                // we parse random text from this wonderfule site:
-                string html = new WebClient().DownloadString("https://randomtextgenerator.com/");
-                string split = html.Split(new string[] { "<div id=\"randomtext_box\">" }, StringSplitOptions.None)[1].Trim();
-                split = split.Split(new string[] { "<!-- RandomTextGenerator.com Top -->" }, StringSplitOptions.None)[0].Trim();
-                split = split.Replace(" <br />\r\n<br />\r\n", " ");
-                split = split.Replace(" \t\t\n\t\n</div>", "");
-                split = split.Trim();
-                text = split.Substring(0, 1500); // 1500 chars it's max
-                                                 // because I used info, that the fastes
-                                                 // typist was 216 wpm, so I used 300 chars * 5 = 1500
-                return text;
-            }
-
-            // parse from json
-            string english = null;
-            List<string> words = new List<string>();
-            using (StreamReader streamReader = new StreamReader("Resources/english.json")) { english = streamReader.ReadToEnd(); }
-            if (english != null)
+                new WebClient().DownloadFile("https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/" + language + ".json",
+                                                "Resources/" + language + ".json");
+            } catch (Exception)
             {
-                dynamic result = JsonConvert.DeserializeObject(english);
-                foreach (var word in result["words"]) words.Add(word.ToString());
-                Console.WriteLine(words[0]);
-                Console.WriteLine(words.Count);
+                string json = new WebClient().DownloadString("https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/_list.json");
+                dynamic result = JsonConvert.DeserializeObject(json);
+                Console.WriteLine("Choose from current list : ");
+                foreach (var word in result) Console.Write(word + " ");
+                Environment.Exit(0);
             }
+        }
 
-            // totally we need 500 words (why?)
+        static StringBuilder GetText(string language)
+        {
             StringBuilder builder = new StringBuilder();
 
-            // if we have some words
+            // parse from json
+            string fromFile = null;
+            List<string> words = new List<string>();
+            using (StreamReader streamReader = new StreamReader("Resources/" + language + ".json")) { fromFile = streamReader.ReadToEnd(); }
+            if (fromFile != null)
+            {
+                dynamic result = JsonConvert.DeserializeObject(fromFile);
+                foreach (var word in result["words"]) words.Add(word.ToString());
+            }
+
             if (words.Count != 0)
             {
                 Random random = new Random();
                 for (int i = 0; i < 300; i++) builder.Append(words[random.Next(0, words.Count)]).Append(" ");
-            } 
-            else
-            {
-                // generate some 
-                for (int i = 0; i < 84; i++) builder.Append("No internet connection or no resources found. ");
             }
+            return builder;
+        }
+
+        string LoadText()
+        {
+            StringBuilder builder = new StringBuilder(); // builder
+            bool fileExist = File.Exists("Resources/" + language + ".json"); // if curr language exists
+
+            // if language specified
+            if (language != null) { 
+                // download if possible
+                if (!fileExist && IsConnectedToInternet()) 
+                { 
+                    DownloadText(language);
+                    fileExist = File.Exists("Resources/" + language + ".json");
+                } 
+            }
+            else language = "english";
+
+            if (fileExist) builder = GetText(language);
+            else for (int i = 0; i < 70; i++) builder.Append("Find not found and can't be loaded. ");
 
             return builder.ToString();
         }
@@ -81,6 +94,12 @@ namespace sscpfe
 
         public SSCPFETypingTestApplication() : base()
         {
+            PrepareNewTest();
+        }
+
+        public SSCPFETypingTestApplication(string language) : base()
+        {
+            this.language = language;
             PrepareNewTest();
         }
 
