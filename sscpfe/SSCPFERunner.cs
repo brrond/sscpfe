@@ -133,13 +133,13 @@ namespace sscpfe
             stringBuilder.AppendLine("Super simple command promt file editor (sscpfe)");
             stringBuilder.AppendLine("https://github.com/greentech72/sscpfe.git");
             stringBuilder.AppendLine("");
-            stringBuilder.AppendLine("sscpfe [filename] [-b filename] [-e] [-e filename] [-cfg] [-tt] [-h]");
+            stringBuilder.AppendLine("sscpfe [filename] [-b filename] [-e] [-e [filename]] [-cfg] [-tt [language]] [-h]");
             stringBuilder.AppendLine("");
             stringBuilder.AppendLine("filename                      - specify file to open or to create");
             stringBuilder.AppendLine("-b, --binary, /b              - read file as binary");
             stringBuilder.AppendLine("-e, --encoding, /e            - open file in specific encoding OR print all available encodings");
             stringBuilder.AppendLine("-cfg, --configuration, /cfg   - open configuration app. Allows to change options of editor");
-            stringBuilder.AppendLine("-tt, --typingtest, /tt        - try it yourself (you need internet for this one)");
+            stringBuilder.AppendLine("-tt, --typingtest, /tt        - try it yourself");
             stringBuilder.AppendLine("-h, --help, /?                - show help");
             Console.WriteLine(stringBuilder.ToString());
         }

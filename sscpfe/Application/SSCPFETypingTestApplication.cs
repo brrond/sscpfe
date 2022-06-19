@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
+using System.Net.NetworkInformation;
+using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace sscpfe
 {
@@ -13,18 +17,57 @@ namespace sscpfe
         Thread stopwatchTread;
         string text;
 
+        bool IsConnectedToInternet()
+        {
+            Ping googlePing = new Ping();
+            return googlePing.Send("google.com").Status == IPStatus.Success;
+        }
+
         string LoadText()
         {
-            string html = new WebClient().DownloadString("https://randomtextgenerator.com/");
-            string split = html.Split(new string[] { "<div id=\"randomtext_box\">" }, StringSplitOptions.None)[1].Trim();
-            split = split.Split(new string[] { "<!-- RandomTextGenerator.com Top -->" }, StringSplitOptions.None)[0].Trim();
-            split = split.Replace(" <br />\r\n<br />\r\n", " ");
-            split = split.Replace(" \t\t\n\t\n</div>", "");
-            split = split.Trim();
-            text = split.Substring(0, 1500); // 1500 chars it's max
-                                             // because I used info, that the fastes
-                                             // typist was 216 wpm, so I used 300 chars * 5 = 1500
-            return text;
+            if (IsConnectedToInternet()) // if device has internet access
+            {
+                // we parse random text from this wonderfule site:
+                string html = new WebClient().DownloadString("https://randomtextgenerator.com/");
+                string split = html.Split(new string[] { "<div id=\"randomtext_box\">" }, StringSplitOptions.None)[1].Trim();
+                split = split.Split(new string[] { "<!-- RandomTextGenerator.com Top -->" }, StringSplitOptions.None)[0].Trim();
+                split = split.Replace(" <br />\r\n<br />\r\n", " ");
+                split = split.Replace(" \t\t\n\t\n</div>", "");
+                split = split.Trim();
+                text = split.Substring(0, 1500); // 1500 chars it's max
+                                                 // because I used info, that the fastes
+                                                 // typist was 216 wpm, so I used 300 chars * 5 = 1500
+                return text;
+            }
+
+            // parse from json
+            string english = null;
+            List<string> words = new List<string>();
+            using (StreamReader streamReader = new StreamReader("Resources/english.json")) { english = streamReader.ReadToEnd(); }
+            if (english != null)
+            {
+                dynamic result = JsonConvert.DeserializeObject(english);
+                foreach (var word in result["words"]) words.Add(word.ToString());
+                Console.WriteLine(words[0]);
+                Console.WriteLine(words.Count);
+            }
+
+            // totally we need 500 words (why?)
+            StringBuilder builder = new StringBuilder();
+
+            // if we have some words
+            if (words.Count != 0)
+            {
+                Random random = new Random();
+                for (int i = 0; i < 300; i++) builder.Append(words[random.Next(0, words.Count)]).Append(" ");
+            } 
+            else
+            {
+                // generate some 
+                for (int i = 0; i < 84; i++) builder.Append("No internet connection or no resources found. ");
+            }
+
+            return builder.ToString();
         }
 
         void PrepareNewTest()
@@ -51,17 +94,22 @@ namespace sscpfe
             stopwatchThreadState = true;
         }
 
-        void HandleTab()
+        bool Restart()
         {
             stopwatchThreadState = false;
             if(AskUser("Do you want to start another test? (y/n)>"))
             {
-                PrepareNewTest(); // TODO: Start another test after first one is done
+                PrepareNewTest();
+                buff = new TypingTestBuffer(text);
+                stopwatchThreadState = true;
+                stopwatchTread = new Thread(UpdateTimer);
+                return true;
             }
             else
             {
                 stopwatchThreadState = true;
             }
+            return false;
         }
 
         void UpdateTimer()
@@ -122,7 +170,7 @@ namespace sscpfe
                         buff.Backspace();
                         break;
                     case KeyboardHandlerCommand.Tab:
-                        HandleTab();
+                        Restart();
                         break;
                     default:
                         throw new SSCPFEHandlerException();
@@ -132,9 +180,9 @@ namespace sscpfe
             // clear console from text
             Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos);
             var it = buff.Buff().GetEnumerator();
-            while (it.MoveNext()) Console.WriteLine(new string(' ', 1000)); // TODO: Fix magic 1000
-            Console.WriteLine(new string(' ', 1000));
-            Console.SetCursorPosition(buff.defaultCursor.XPos, buff.defaultCursor.YPos); // + 2?
+            while (it.MoveNext()) Console.WriteLine(new string(' ', Console.WindowWidth));
+            Console.WriteLine(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, buff.defaultCursor.YPos + 2);
 
             // calculate wpm
             int allTypedEntries = 0;
@@ -168,8 +216,9 @@ namespace sscpfe
                 allTypedEntries, GrossWPM.ToString("F2"), NetWPM.ToString("F2"), (Accuracy * 100).ToString("F2"), 
                 (CorrectedAccuracy * 100).ToString("F2"));
             Console.WriteLine("If you want to start again use TAB, or ESC to exist");
-            while (true)
-            {
+
+            bool restart = false;
+            do { 
                 switch (kh.Handle()) 
                 {
                     case KeyboardHandlerCommand.UpArrow:
@@ -194,12 +243,15 @@ namespace sscpfe
                         HandleEsc();
                         break;
                     case KeyboardHandlerCommand.Tab:
-                        HandleTab();
+                        restart = Restart();
                         break;
                     default:
                         throw new SSCPFEHandlerException();
-                }
-            }
+                } 
+
+            } while (!restart);
+
+            Mainloop(); // TODO: stackoverflow problem
         }
 
     }

@@ -3,6 +3,7 @@ using System.Configuration;
 using System;
 using System.Threading;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace sscpfe
 {
@@ -25,6 +26,8 @@ namespace sscpfe
             // ask user and set value for every possible cfg
             // Possible settings: 
             // TabSize
+            // ForegounrdColor//
+            // BackgroundColor//
 
             Configuration cfg = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             int tabSize = int.Parse(cfg.AppSettings.Settings["TabSize"].Value);
