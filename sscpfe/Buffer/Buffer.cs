@@ -81,7 +81,7 @@ namespace sscpfe
 
             // print one screen
             Console.SetCursorPosition(0, defaultCursor.YPos + 1);
-            for (int i = printFrom; i < printFrom + Console.WindowHeight; i++)
+            for (int i = printFrom; i < printFrom + Console.WindowHeight && i < buff.Count; i++)
             {
                 string baseString = buff[i];
                 int pos = cursor.XPos / rightBorder * rightBorder;
