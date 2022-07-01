@@ -16,6 +16,7 @@ namespace sscpfe
         bool stopwatchThreadState;
         Thread stopwatchTread;
         string language = null, text;
+        static string pathToResources = System.Reflection.Assembly.GetEntryAssembly().Location.Replace("sscpfe.exe", "Resources\\");
 
         bool IsConnectedToInternet()
         {
@@ -28,7 +29,7 @@ namespace sscpfe
             try
             {
                 new WebClient().DownloadFile("https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/" + language + ".json",
-                                                "Resources/" + language + ".json");
+                                                pathToResources + language + ".json");
             } catch (Exception)
             {
                 string json = new WebClient().DownloadString("https://raw.githubusercontent.com/monkeytypegame/monkeytype/master/frontend/static/languages/_list.json");
@@ -46,7 +47,7 @@ namespace sscpfe
             // parse from json
             string fromFile = null;
             List<string> words = new List<string>();
-            using (StreamReader streamReader = new StreamReader("Resources/" + language + ".json")) { fromFile = streamReader.ReadToEnd(); }
+            using (StreamReader streamReader = new StreamReader(pathToResources + language + ".json")) { fromFile = streamReader.ReadToEnd(); }
             if (fromFile != null)
             {
                 dynamic result = JsonConvert.DeserializeObject(fromFile);
@@ -64,7 +65,7 @@ namespace sscpfe
         string LoadText()
         {
             StringBuilder builder = new StringBuilder(); // builder
-            bool fileExist = File.Exists("Resources/" + language + ".json"); // if curr language exists
+            bool fileExist = File.Exists(pathToResources + language + ".json"); // if curr language exists
 
             // if language specified
             if (language != null) { 
@@ -72,13 +73,13 @@ namespace sscpfe
                 if (!fileExist && IsConnectedToInternet()) 
                 { 
                     DownloadText(language);
-                    fileExist = File.Exists("Resources/" + language + ".json");
+                    fileExist = File.Exists(pathToResources + language + ".json");
                 } 
             }
             else language = "english";
 
             if (fileExist) builder = GetText(language);
-            else for (int i = 0; i < 70; i++) builder.Append("Find not found and can't be loaded. ");
+            else for (int i = 0; i < 70; i++) builder.Append("File not found and can't be loaded. ");
 
             return builder.ToString();
         }
