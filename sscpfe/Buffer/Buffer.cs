@@ -100,6 +100,9 @@ namespace sscpfe
 
         int printFrom = 0;
         int rightBorder = Console.WindowWidth;
+        int moveScreen = 0; // 0 - no
+                            // 1 - MoveUP
+                            // -1 - MoveDOWN
 
         // print buffer
         public void Print()
@@ -116,6 +119,19 @@ namespace sscpfe
             if(newLineCounter != 0)
             {
                 FullPrint(); // reprint whole screen
+            }
+
+            // if we reached the end or the beginning of current screen
+            // make sense to move current screen and repring current line
+            // if user moves down then screen goes up for one line
+            // if user mvoes up then screen goes down for one line
+            if (moveScreen != 0)
+            {
+                int invariantForTop = moveScreen == -1 ? 1 : 0; // instead of if-else (one linear)
+                Console.MoveBufferArea(0, defaultCursor.YPos + Math.Abs(invariantForTop), 
+                    rightBorder, Console.WindowHeight, 
+                    0, defaultCursor.YPos + 1 - invariantForTop);
+                moveScreen = 0;
             }
 
             // commented old variant maybe it's good enough
@@ -329,7 +345,7 @@ namespace sscpfe
                 if (cursor.YPos == printFrom && printFrom != 0)
                 {
                     printFrom--;
-                    newLineCounter++;
+                    moveScreen = 1;
                 }
             }
         }
@@ -344,7 +360,7 @@ namespace sscpfe
                 if (cursor.YPos == printFrom + Console.WindowHeight)
                 {
                     printFrom++;
-                    newLineCounter++;
+                    moveScreen = -1;
                 }
             }
         }
